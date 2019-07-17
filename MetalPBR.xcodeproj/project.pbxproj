@@ -21,7 +21,65 @@
 		DA54A19A214BECBE007BEEA4 /* ShaderTypes.h in Resources */ = {isa = PBXBuildFile; fileRef = DA54A174214BECBC007BEEA4 /* ShaderTypes.h */; };
 		DA54A19B214BECBE007BEEA4 /* ShaderTypes.h in Resources */ = {isa = PBXBuildFile; fileRef = DA54A174214BECBC007BEEA4 /* ShaderTypes.h */; };
 		DA54A19C214BECBE007BEEA4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DA54A175214BECBE007BEEA4 /* Assets.xcassets */; };
-		DA54A19D214BECBE007BEEA4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DA54A175214BECBE007BEEA4 /* Assets.xcassets */; };
+		DA54A1A7214BED69007BEEA4 /* Maths.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA54A1A6214BED69007BEEA4 /* Maths.swift */; };
+		DA54A1A8214BED69007BEEA4 /* Maths.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA54A1A6214BED69007BEEA4 /* Maths.swift */; };
+		DA54A1AD214BEDB3007BEEA4 /* Camera.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA54A1AC214BEDB3007BEEA4 /* Camera.swift */; };
+		DA54A1AE214BEDB3007BEEA4 /* Camera.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA54A1AC214BEDB3007BEEA4 /* Camera.swift */; };
+		DA54A1B0214BEDE1007BEEA4 /* KeyCodes.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA54A1AF214BEDE1007BEEA4 /* KeyCodes.swift */; };
+		DA54A1B1214BEDE1007BEEA4 /* KeyCodes.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA54A1AF214BEDE1007BEEA4 /* KeyCodes.swift */; };
+		DA54A1B6214BEE25007BEEA4 /* UserInputs.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA54A1B5214BEE25007BEEA4 /* UserInputs.swift */; };
+		DA54A1B7214BEE25007BEEA4 /* UserInputs.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA54A1B5214BEE25007BEEA4 /* UserInputs.swift */; };
+		DA54A1B9214BEE4A007BEEA4 /* ConvenienceExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA54A1B8214BEE4A007BEEA4 /* ConvenienceExtensions.swift */; };
+		DA54A1BA214BEE4A007BEEA4 /* ConvenienceExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA54A1B8214BEE4A007BEEA4 /* ConvenienceExtensions.swift */; };
+		DA54A1BC214BEE77007BEEA4 /* Texture.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA54A1BB214BEE77007BEEA4 /* Texture.swift */; };
+		DA54A1BD214BEE77007BEEA4 /* Texture.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA54A1BB214BEE77007BEEA4 /* Texture.swift */; };
+		DA54A1BF214BEE97007BEEA4 /* Mesh.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA54A1BE214BEE97007BEEA4 /* Mesh.swift */; };
+		DA54A1C0214BEE97007BEEA4 /* Mesh.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA54A1BE214BEE97007BEEA4 /* Mesh.swift */; };
+		DA54A1C2214BEEC3007BEEA4 /* Skybox.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA54A1C1214BEEC3007BEEA4 /* Skybox.swift */; };
+		DA54A1C3214BEEC3007BEEA4 /* Skybox.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA54A1C1214BEEC3007BEEA4 /* Skybox.swift */; };
+		DA54A1C5214BEEE9007BEEA4 /* SceneAsset.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA54A1C4214BEEE9007BEEA4 /* SceneAsset.swift */; };
+		DA54A1C6214BEEE9007BEEA4 /* SceneAsset.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA54A1C4214BEEE9007BEEA4 /* SceneAsset.swift */; };
+		DA54A1C8214BEF10007BEEA4 /* GameObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA54A1C7214BEF10007BEEA4 /* GameObject.swift */; };
+		DA54A1C9214BEF10007BEEA4 /* GameObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA54A1C7214BEF10007BEEA4 /* GameObject.swift */; };
+		DA54A1CB214BEF28007BEEA4 /* Material.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA54A1CA214BEF28007BEEA4 /* Material.swift */; };
+		DA54A1CC214BEF28007BEEA4 /* Material.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA54A1CA214BEF28007BEEA4 /* Material.swift */; };
+		DA54A1CE214BF01D007BEEA4 /* CameraController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA54A1CD214BF01D007BEEA4 /* CameraController.swift */; };
+		DA54A1D0214BF046007BEEA4 /* TouchInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA54A1CF214BF046007BEEA4 /* TouchInput.swift */; };
+		DA54A1D2214BF0A5007BEEA4 /* CameraController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA54A1D1214BF0A5007BEEA4 /* CameraController.swift */; };
+		DA54A1D4214BF0D4007BEEA4 /* MacInputs.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA54A1D3214BF0D4007BEEA4 /* MacInputs.swift */; };
+		DA54A1D8214BF156007BEEA4 /* Robot.obj in Resources */ = {isa = PBXBuildFile; fileRef = DA54A1D6214BF156007BEEA4 /* Robot.obj */; };
+		DA54A1D9214BF156007BEEA4 /* Robot.mtl in Resources */ = {isa = PBXBuildFile; fileRef = DA54A1D7214BF156007BEEA4 /* Robot.mtl */; };
+		DA54A1E0214BF166007BEEA4 /* scene.obj in Resources */ = {isa = PBXBuildFile; fileRef = DA54A1DA214BF165007BEEA4 /* scene.obj */; };
+		DA54A1E1214BF166007BEEA4 /* helmet_metallic.jpg in Resources */ = {isa = PBXBuildFile; fileRef = DA54A1DB214BF166007BEEA4 /* helmet_metallic.jpg */; };
+		DA54A1E2214BF166007BEEA4 /* helmet_roughness.jpg in Resources */ = {isa = PBXBuildFile; fileRef = DA54A1DC214BF166007BEEA4 /* helmet_roughness.jpg */; };
+		DA54A1E3214BF166007BEEA4 /* helmet_normal.jpg in Resources */ = {isa = PBXBuildFile; fileRef = DA54A1DD214BF166007BEEA4 /* helmet_normal.jpg */; };
+		DA54A1E4214BF166007BEEA4 /* helmet_baseColor.png in Resources */ = {isa = PBXBuildFile; fileRef = DA54A1DE214BF166007BEEA4 /* helmet_baseColor.png */; };
+		DA54A1E5214BF166007BEEA4 /* scene.mtl in Resources */ = {isa = PBXBuildFile; fileRef = DA54A1DF214BF166007BEEA4 /* scene.mtl */; };
+		DA5CEEFC22D36FA500B476C1 /* Scene.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA5CEEFB22D36FA500B476C1 /* Scene.swift */; };
+		DA5CEEFD22D36FA500B476C1 /* Scene.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA5CEEFB22D36FA500B476C1 /* Scene.swift */; };
+		DA5CEEFF22D3703700B476C1 /* RobotScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA5CEEFE22D3703700B476C1 /* RobotScene.swift */; };
+		DA5CEF0022D3703700B476C1 /* RobotScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA5CEEFE22D3703700B476C1 /* RobotScene.swift */; };
+		DA5CEF0222D3726600B476C1 /* ResourceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA5CEF0122D3726600B476C1 /* ResourceManager.swift */; };
+		DA5CEF0322D3726600B476C1 /* ResourceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA5CEF0122D3726600B476C1 /* ResourceManager.swift */; };
+		DA5CEF0522D374F900B476C1 /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA5CEF0422D374F900B476C1 /* Model.swift */; };
+		DA5CEF0622D374F900B476C1 /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA5CEF0422D374F900B476C1 /* Model.swift */; };
+		DA5CEF0A22D6397300B476C1 /* garage_pmrem.ktx in Resources */ = {isa = PBXBuildFile; fileRef = DA54A1D5214BF136007BEEA4 /* garage_pmrem.ktx */; };
+		DA5CEF0B22D6399D00B476C1 /* garage_pmrem.ktx in Resources */ = {isa = PBXBuildFile; fileRef = DA54A1D5214BF136007BEEA4 /* garage_pmrem.ktx */; };
+		DA5CEF0C22D6399D00B476C1 /* helmet_baseColor.png in Resources */ = {isa = PBXBuildFile; fileRef = DA54A1DE214BF166007BEEA4 /* helmet_baseColor.png */; };
+		DA5CEF0D22D6399D00B476C1 /* helmet_metallic.jpg in Resources */ = {isa = PBXBuildFile; fileRef = DA54A1DB214BF166007BEEA4 /* helmet_metallic.jpg */; };
+		DA5CEF0E22D6399D00B476C1 /* helmet_normal.jpg in Resources */ = {isa = PBXBuildFile; fileRef = DA54A1DD214BF166007BEEA4 /* helmet_normal.jpg */; };
+		DA5CEF0F22D6399D00B476C1 /* helmet_roughness.jpg in Resources */ = {isa = PBXBuildFile; fileRef = DA54A1DC214BF166007BEEA4 /* helmet_roughness.jpg */; };
+		DA5CEF1022D6399D00B476C1 /* scene.mtl in Resources */ = {isa = PBXBuildFile; fileRef = DA54A1DF214BF166007BEEA4 /* scene.mtl */; };
+		DA5CEF1122D6399D00B476C1 /* scene.obj in Resources */ = {isa = PBXBuildFile; fileRef = DA54A1DA214BF165007BEEA4 /* scene.obj */; };
+		DA5CEF1222D6399D00B476C1 /* Robot.mtl in Resources */ = {isa = PBXBuildFile; fileRef = DA54A1D7214BF156007BEEA4 /* Robot.mtl */; };
+		DA5CEF1322D6399D00B476C1 /* Robot.obj in Resources */ = {isa = PBXBuildFile; fileRef = DA54A1D6214BF156007BEEA4 /* Robot.obj */; };
+		DA5CEF1822D8A5E300B476C1 /* MosquitoScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA5CEF1722D8A5E300B476C1 /* MosquitoScene.swift */; };
+		DA5CEF1922D8A5E300B476C1 /* MosquitoScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA5CEF1722D8A5E300B476C1 /* MosquitoScene.swift */; };
+		DA5CEF1B22D8A8B000B476C1 /* Mosquito.obj in Resources */ = {isa = PBXBuildFile; fileRef = DA5CEF1A22D8A8B000B476C1 /* Mosquito.obj */; };
+		DA5CEF1C22D8A8B000B476C1 /* Mosquito.obj in Resources */ = {isa = PBXBuildFile; fileRef = DA5CEF1A22D8A8B000B476C1 /* Mosquito.obj */; };
+		DA5CEF1E22D8A8BA00B476C1 /* Mosquito.mtl in Resources */ = {isa = PBXBuildFile; fileRef = DA5CEF1D22D8A8BA00B476C1 /* Mosquito.mtl */; };
+		DA5CEF1F22D8A8BA00B476C1 /* Mosquito.mtl in Resources */ = {isa = PBXBuildFile; fileRef = DA5CEF1D22D8A8BA00B476C1 /* Mosquito.mtl */; };
+		DA5CEF2222DA33DE00B476C1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DA54A175214BECBE007BEEA4 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -40,6 +98,37 @@
 		DA54A190214BECBE007BEEA4 /* GameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewController.swift; sourceTree = "<group>"; };
 		DA54A193214BECBE007BEEA4 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		DA54A195214BECBE007BEEA4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		DA54A1A6214BED69007BEEA4 /* Maths.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Maths.swift; sourceTree = "<group>"; };
+		DA54A1AC214BEDB3007BEEA4 /* Camera.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Camera.swift; sourceTree = "<group>"; };
+		DA54A1AF214BEDE1007BEEA4 /* KeyCodes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyCodes.swift; sourceTree = "<group>"; };
+		DA54A1B5214BEE25007BEEA4 /* UserInputs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserInputs.swift; sourceTree = "<group>"; };
+		DA54A1B8214BEE4A007BEEA4 /* ConvenienceExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConvenienceExtensions.swift; sourceTree = "<group>"; };
+		DA54A1BB214BEE77007BEEA4 /* Texture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Texture.swift; sourceTree = "<group>"; };
+		DA54A1BE214BEE97007BEEA4 /* Mesh.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mesh.swift; sourceTree = "<group>"; };
+		DA54A1C1214BEEC3007BEEA4 /* Skybox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Skybox.swift; sourceTree = "<group>"; };
+		DA54A1C4214BEEE9007BEEA4 /* SceneAsset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneAsset.swift; sourceTree = "<group>"; };
+		DA54A1C7214BEF10007BEEA4 /* GameObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameObject.swift; sourceTree = "<group>"; };
+		DA54A1CA214BEF28007BEEA4 /* Material.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Material.swift; sourceTree = "<group>"; };
+		DA54A1CD214BF01D007BEEA4 /* CameraController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraController.swift; sourceTree = "<group>"; };
+		DA54A1CF214BF046007BEEA4 /* TouchInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TouchInput.swift; sourceTree = "<group>"; };
+		DA54A1D1214BF0A5007BEEA4 /* CameraController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraController.swift; sourceTree = "<group>"; };
+		DA54A1D3214BF0D4007BEEA4 /* MacInputs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacInputs.swift; sourceTree = "<group>"; };
+		DA54A1D5214BF136007BEEA4 /* garage_pmrem.ktx */ = {isa = PBXFileReference; lastKnownFileType = file; path = garage_pmrem.ktx; sourceTree = "<group>"; };
+		DA54A1D6214BF156007BEEA4 /* Robot.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Robot.obj; sourceTree = "<group>"; };
+		DA54A1D7214BF156007BEEA4 /* Robot.mtl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Robot.mtl; sourceTree = "<group>"; };
+		DA54A1DA214BF165007BEEA4 /* scene.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = scene.obj; sourceTree = "<group>"; };
+		DA54A1DB214BF166007BEEA4 /* helmet_metallic.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = helmet_metallic.jpg; sourceTree = "<group>"; };
+		DA54A1DC214BF166007BEEA4 /* helmet_roughness.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = helmet_roughness.jpg; sourceTree = "<group>"; };
+		DA54A1DD214BF166007BEEA4 /* helmet_normal.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = helmet_normal.jpg; sourceTree = "<group>"; };
+		DA54A1DE214BF166007BEEA4 /* helmet_baseColor.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = helmet_baseColor.png; sourceTree = "<group>"; };
+		DA54A1DF214BF166007BEEA4 /* scene.mtl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = scene.mtl; sourceTree = "<group>"; };
+		DA5CEEFB22D36FA500B476C1 /* Scene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scene.swift; sourceTree = "<group>"; };
+		DA5CEEFE22D3703700B476C1 /* RobotScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RobotScene.swift; sourceTree = "<group>"; };
+		DA5CEF0122D3726600B476C1 /* ResourceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceManager.swift; sourceTree = "<group>"; };
+		DA5CEF0422D374F900B476C1 /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
+		DA5CEF1722D8A5E300B476C1 /* MosquitoScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MosquitoScene.swift; sourceTree = "<group>"; };
+		DA5CEF1A22D8A8B000B476C1 /* Mosquito.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Mosquito.obj; sourceTree = "<group>"; };
+		DA5CEF1D22D8A8BA00B476C1 /* Mosquito.mtl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Mosquito.mtl; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,20 +152,37 @@
 		DA54A16C214BECBC007BEEA4 = {
 			isa = PBXGroup;
 			children = (
+				DA5CEF1722D8A5E300B476C1 /* MosquitoScene.swift */,
+				DA5CEEFE22D3703700B476C1 /* RobotScene.swift */,
 				DA54A171214BECBC007BEEA4 /* MetalPBR Shared */,
 				DA54A17C214BECBE007BEEA4 /* MetalPBR iOS */,
 				DA54A18D214BECBE007BEEA4 /* MetalPBR macOS */,
 				DA54A17B214BECBE007BEEA4 /* Products */,
+				DA54A1E8214BF1DA007BEEA4 /* Resources */,
 			);
 			sourceTree = "<group>";
 		};
 		DA54A171214BECBC007BEEA4 /* MetalPBR Shared */ = {
 			isa = PBXGroup;
 			children = (
-				DA54A172214BECBC007BEEA4 /* Shaders.metal */,
+				DA54A1AC214BEDB3007BEEA4 /* Camera.swift */,
+				DA54A1B8214BEE4A007BEEA4 /* ConvenienceExtensions.swift */,
+				DA54A1AF214BEDE1007BEEA4 /* KeyCodes.swift */,
+				DA54A1CA214BEF28007BEEA4 /* Material.swift */,
+				DA54A1A6214BED69007BEEA4 /* Maths.swift */,
+				DA54A1BE214BEE97007BEEA4 /* Mesh.swift */,
+				DA54A1C7214BEF10007BEEA4 /* GameObject.swift */,
 				DA54A173214BECBC007BEEA4 /* Renderer.swift */,
+				DA54A1C4214BEEE9007BEEA4 /* SceneAsset.swift */,
+				DA54A172214BECBC007BEEA4 /* Shaders.metal */,
 				DA54A174214BECBC007BEEA4 /* ShaderTypes.h */,
+				DA54A1C1214BEEC3007BEEA4 /* Skybox.swift */,
+				DA54A1BB214BEE77007BEEA4 /* Texture.swift */,
+				DA54A1B5214BEE25007BEEA4 /* UserInputs.swift */,
 				DA54A175214BECBE007BEEA4 /* Assets.xcassets */,
+				DA5CEEFB22D36FA500B476C1 /* Scene.swift */,
+				DA5CEF0122D3726600B476C1 /* ResourceManager.swift */,
+				DA5CEF0422D374F900B476C1 /* Model.swift */,
 			);
 			path = "MetalPBR Shared";
 			sourceTree = "<group>";
@@ -98,6 +204,8 @@
 				DA54A181214BECBE007BEEA4 /* Main.storyboard */,
 				DA54A184214BECBE007BEEA4 /* LaunchScreen.storyboard */,
 				DA54A187214BECBE007BEEA4 /* Info.plist */,
+				DA54A1CD214BF01D007BEEA4 /* CameraController.swift */,
+				DA54A1CF214BF046007BEEA4 /* TouchInput.swift */,
 			);
 			path = "MetalPBR iOS";
 			sourceTree = "<group>";
@@ -109,8 +217,52 @@
 				DA54A190214BECBE007BEEA4 /* GameViewController.swift */,
 				DA54A192214BECBE007BEEA4 /* Main.storyboard */,
 				DA54A195214BECBE007BEEA4 /* Info.plist */,
+				DA54A1D1214BF0A5007BEEA4 /* CameraController.swift */,
+				DA54A1D3214BF0D4007BEEA4 /* MacInputs.swift */,
 			);
 			path = "MetalPBR macOS";
+			sourceTree = "<group>";
+		};
+		DA54A1E6214BF190007BEEA4 /* Robot */ = {
+			isa = PBXGroup;
+			children = (
+				DA54A1D7214BF156007BEEA4 /* Robot.mtl */,
+				DA54A1D6214BF156007BEEA4 /* Robot.obj */,
+			);
+			path = Robot;
+			sourceTree = "<group>";
+		};
+		DA54A1E7214BF1B4007BEEA4 /* Helmet */ = {
+			isa = PBXGroup;
+			children = (
+				DA54A1DE214BF166007BEEA4 /* helmet_baseColor.png */,
+				DA54A1DB214BF166007BEEA4 /* helmet_metallic.jpg */,
+				DA54A1DD214BF166007BEEA4 /* helmet_normal.jpg */,
+				DA54A1DC214BF166007BEEA4 /* helmet_roughness.jpg */,
+				DA54A1DF214BF166007BEEA4 /* scene.mtl */,
+				DA54A1DA214BF165007BEEA4 /* scene.obj */,
+			);
+			path = Helmet;
+			sourceTree = "<group>";
+		};
+		DA54A1E8214BF1DA007BEEA4 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				DA54A1D5214BF136007BEEA4 /* garage_pmrem.ktx */,
+				DA5CEF2022D8A8C400B476C1 /* Mosquito */,
+				DA54A1E7214BF1B4007BEEA4 /* Helmet */,
+				DA54A1E6214BF190007BEEA4 /* Robot */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		DA5CEF2022D8A8C400B476C1 /* Mosquito */ = {
+			isa = PBXGroup;
+			children = (
+				DA5CEF1A22D8A8B000B476C1 /* Mosquito.obj */,
+				DA5CEF1D22D8A8BA00B476C1 /* Mosquito.mtl */,
+			);
+			path = Mosquito;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -162,9 +314,11 @@
 				TargetAttributes = {
 					DA54A179214BECBE007BEEA4 = {
 						CreatedOnToolsVersion = 9.4.1;
+						LastSwiftMigration = 1100;
 					};
 					DA54A18B214BECBE007BEEA4 = {
 						CreatedOnToolsVersion = 9.4.1;
+						LastSwiftMigration = 1100;
 					};
 				};
 			};
@@ -192,6 +346,17 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DA5CEF0B22D6399D00B476C1 /* garage_pmrem.ktx in Resources */,
+				DA5CEF0C22D6399D00B476C1 /* helmet_baseColor.png in Resources */,
+				DA5CEF0D22D6399D00B476C1 /* helmet_metallic.jpg in Resources */,
+				DA5CEF0E22D6399D00B476C1 /* helmet_normal.jpg in Resources */,
+				DA5CEF0F22D6399D00B476C1 /* helmet_roughness.jpg in Resources */,
+				DA5CEF1022D6399D00B476C1 /* scene.mtl in Resources */,
+				DA5CEF1B22D8A8B000B476C1 /* Mosquito.obj in Resources */,
+				DA5CEF1E22D8A8BA00B476C1 /* Mosquito.mtl in Resources */,
+				DA5CEF1122D6399D00B476C1 /* scene.obj in Resources */,
+				DA5CEF1222D6399D00B476C1 /* Robot.mtl in Resources */,
+				DA5CEF1322D6399D00B476C1 /* Robot.obj in Resources */,
 				DA54A19A214BECBE007BEEA4 /* ShaderTypes.h in Resources */,
 				DA54A183214BECBE007BEEA4 /* Main.storyboard in Resources */,
 				DA54A19C214BECBE007BEEA4 /* Assets.xcassets in Resources */,
@@ -203,9 +368,20 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DA5CEF2222DA33DE00B476C1 /* Assets.xcassets in Resources */,
+				DA5CEF0A22D6397300B476C1 /* garage_pmrem.ktx in Resources */,
+				DA54A1D8214BF156007BEEA4 /* Robot.obj in Resources */,
 				DA54A194214BECBE007BEEA4 /* Main.storyboard in Resources */,
-				DA54A19D214BECBE007BEEA4 /* Assets.xcassets in Resources */,
+				DA54A1D9214BF156007BEEA4 /* Robot.mtl in Resources */,
+				DA5CEF1C22D8A8B000B476C1 /* Mosquito.obj in Resources */,
+				DA5CEF1F22D8A8BA00B476C1 /* Mosquito.mtl in Resources */,
+				DA54A1E5214BF166007BEEA4 /* scene.mtl in Resources */,
+				DA54A1E0214BF166007BEEA4 /* scene.obj in Resources */,
+				DA54A1E1214BF166007BEEA4 /* helmet_metallic.jpg in Resources */,
 				DA54A19B214BECBE007BEEA4 /* ShaderTypes.h in Resources */,
+				DA54A1E4214BF166007BEEA4 /* helmet_baseColor.png in Resources */,
+				DA54A1E3214BF166007BEEA4 /* helmet_normal.jpg in Resources */,
+				DA54A1E2214BF166007BEEA4 /* helmet_roughness.jpg in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -216,10 +392,28 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DA5CEF0522D374F900B476C1 /* Model.swift in Sources */,
 				DA54A198214BECBE007BEEA4 /* Renderer.swift in Sources */,
+				DA54A1BF214BEE97007BEEA4 /* Mesh.swift in Sources */,
+				DA54A1BC214BEE77007BEEA4 /* Texture.swift in Sources */,
+				DA54A1D0214BF046007BEEA4 /* TouchInput.swift in Sources */,
+				DA54A1B0214BEDE1007BEEA4 /* KeyCodes.swift in Sources */,
 				DA54A196214BECBE007BEEA4 /* Shaders.metal in Sources */,
+				DA54A1AD214BEDB3007BEEA4 /* Camera.swift in Sources */,
 				DA54A180214BECBE007BEEA4 /* GameViewController.swift in Sources */,
+				DA5CEEFC22D36FA500B476C1 /* Scene.swift in Sources */,
+				DA5CEF0222D3726600B476C1 /* ResourceManager.swift in Sources */,
+				DA54A1C2214BEEC3007BEEA4 /* Skybox.swift in Sources */,
+				DA54A1C5214BEEE9007BEEA4 /* SceneAsset.swift in Sources */,
+				DA5CEF1822D8A5E300B476C1 /* MosquitoScene.swift in Sources */,
+				DA54A1B6214BEE25007BEEA4 /* UserInputs.swift in Sources */,
+				DA5CEEFF22D3703700B476C1 /* RobotScene.swift in Sources */,
+				DA54A1CB214BEF28007BEEA4 /* Material.swift in Sources */,
+				DA54A1B9214BEE4A007BEEA4 /* ConvenienceExtensions.swift in Sources */,
+				DA54A1A7214BED69007BEEA4 /* Maths.swift in Sources */,
 				DA54A17E214BECBE007BEEA4 /* AppDelegate.swift in Sources */,
+				DA54A1CE214BF01D007BEEA4 /* CameraController.swift in Sources */,
+				DA54A1C8214BEF10007BEEA4 /* GameObject.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -227,10 +421,28 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DA5CEF0622D374F900B476C1 /* Model.swift in Sources */,
 				DA54A199214BECBE007BEEA4 /* Renderer.swift in Sources */,
+				DA54A1C0214BEE97007BEEA4 /* Mesh.swift in Sources */,
+				DA54A1BD214BEE77007BEEA4 /* Texture.swift in Sources */,
+				DA54A1B1214BEDE1007BEEA4 /* KeyCodes.swift in Sources */,
 				DA54A197214BECBE007BEEA4 /* Shaders.metal in Sources */,
+				DA54A1AE214BEDB3007BEEA4 /* Camera.swift in Sources */,
 				DA54A191214BECBE007BEEA4 /* GameViewController.swift in Sources */,
+				DA54A1C3214BEEC3007BEEA4 /* Skybox.swift in Sources */,
+				DA5CEEFD22D36FA500B476C1 /* Scene.swift in Sources */,
+				DA5CEF0322D3726600B476C1 /* ResourceManager.swift in Sources */,
+				DA54A1C6214BEEE9007BEEA4 /* SceneAsset.swift in Sources */,
+				DA54A1D4214BF0D4007BEEA4 /* MacInputs.swift in Sources */,
+				DA5CEF1922D8A5E300B476C1 /* MosquitoScene.swift in Sources */,
+				DA54A1B7214BEE25007BEEA4 /* UserInputs.swift in Sources */,
+				DA5CEF0022D3703700B476C1 /* RobotScene.swift in Sources */,
+				DA54A1CC214BEF28007BEEA4 /* Material.swift in Sources */,
+				DA54A1BA214BEE4A007BEEA4 /* ConvenienceExtensions.swift in Sources */,
+				DA54A1A8214BED69007BEEA4 /* Maths.swift in Sources */,
 				DA54A18F214BECBE007BEEA4 /* AppDelegate.swift in Sources */,
+				DA54A1D2214BF0A5007BEEA4 /* CameraController.swift in Sources */,
+				DA54A1C9214BEF10007BEEA4 /* GameObject.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -379,7 +591,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = SY5FFSAMLT;
 				INFOPLIST_FILE = "MetalPBR iOS/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -388,7 +600,7 @@
 				PRODUCT_NAME = MetalPBR;
 				SDKROOT = iphoneos;
 				SWIFT_OBJC_BRIDGING_HEADER = "MetalPBR Shared/ShaderTypes.h";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -401,7 +613,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = SY5FFSAMLT;
 				INFOPLIST_FILE = "MetalPBR iOS/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -410,7 +622,7 @@
 				PRODUCT_NAME = MetalPBR;
 				SDKROOT = iphoneos;
 				SWIFT_OBJC_BRIDGING_HEADER = "MetalPBR Shared/ShaderTypes.h";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
@@ -429,12 +641,12 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				PRODUCT_BUNDLE_IDENTIFIER = adilPatel.MetalPBR;
 				PRODUCT_NAME = MetalPBR;
 				SDKROOT = macosx;
 				SWIFT_OBJC_BRIDGING_HEADER = "MetalPBR Shared/ShaderTypes.h";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -451,12 +663,12 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				PRODUCT_BUNDLE_IDENTIFIER = adilPatel.MetalPBR;
 				PRODUCT_NAME = MetalPBR;
 				SDKROOT = macosx;
 				SWIFT_OBJC_BRIDGING_HEADER = "MetalPBR Shared/ShaderTypes.h";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
