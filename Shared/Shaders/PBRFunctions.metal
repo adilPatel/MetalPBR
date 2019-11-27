@@ -1,5 +1,5 @@
 //
-//  Shaders.metal
+//  PBRFunctions.metal
 //  MetalPBR Shared
 //
 //  Created by Adil Patel on 14/09/2018.
@@ -9,63 +9,14 @@
 // File for Metal kernel and shader functions
 
 #include <metal_stdlib>
-#include <simd/simd.h>
 
-#include <metal_stdlib>
-#include <simd/simd.h>
+#import "ShaderSupport.metal"
 
-#import "ShaderTypes.h"
 
 using namespace metal;
 
-// ----- Generic maths functions -----
-
-float squared(float a) {
-    return a * a;
-}
-
-// The layout in the vertex array
-struct Vertex {
-    float3 position  [[attribute(VertexAttributeVNTTPosition)]];
-    float3 normal    [[attribute(VertexAttributeVNTTNormal)]];
-    float3 tangent   [[attribute(VertexAttributeVNTTTangent)]];
-    float2 texCoords [[attribute(VertexAttributeVNTTTexcoord)]];
-};
-
-// The output of the vertex shader, which will be fed into the fragment shader
-struct VertexOut {
-    float4 position [[position]];
-    float2 texCoords;
-    half3 worldPos;
-    half3 normal;
-    half3 bitangent;
-    half3 tangent;
-};
-
-// Convenience structure
-struct LightingParameters {
-    
-    half3 lightDir;
-    half3 viewDir;
-    half3 halfVector;
-    half3 reflectedVector;
-    half3 normal;
-    half3 reflectedcolour;
-    half3 irradiatedcolour;
-    half3 basecolour;
-    half3 diffuseLightcolour;
-    half  NdotH;
-    half  NdotV;
-    half  NdotL;
-    half  HdotL;
-    half  metalness;
-    half  roughness;
-    
-};
-
 // Light and material data
 constant half3 directionalLightInvDirection = half3(0.0h, 1.0h, 0.0h);;
-constant half toneMapExposure = 3.0h;
 
 #define SRGB_ALPHA 0.055h
 
@@ -198,81 +149,4 @@ fragment half4 helloFragmentShader(VertexOut in                         [[stage_
     
     return half4(colour, basecolour.a);
     
-}
-
-// ----- Skybox shaders -----
-
-typedef struct {
-    float3 position;
-} SkyboxVertex;
-
-typedef struct {
-    float4 position [[position]];
-    float3 texCoord;
-} SkyboxRasteriserData;
-
-vertex SkyboxRasteriserData SkyboxVertexShader(uint vertexID [[vertex_id]],
-                                               const device SkyboxVertex *vertices [[buffer(BufferIndexMeshPositions)]],
-                                               constant SkyboxTransforms &transforms [[buffer(BufferIndexLocalUniforms)]]) {
-    
-    float3 position = float3(vertices[vertexID].position);
-    
-    SkyboxRasteriserData out;
-    out.position = transforms.modelViewProjectionMatrix * float4(position, 1.0f);
-    out.texCoord = position;
-    
-    return out;
-    
-}
-
-fragment half4 SkyboxFragmentShader(SkyboxRasteriserData in [[stage_in]],
-                                    texturecube<half, access::sample> texture,
-                                    sampler samplerCube [[sampler(0)]]) {
-    
-    return texture.sample(samplerCube, in.texCoord);
-    
-}
-
-// ----- Post-processing Shaders
-typedef struct {
-    packed_float2 position;
-    packed_float2 texCoord;
-} PostShaderVertex;
-
-typedef struct {
-    float4 position [[position]];
-    float2 texCoord;
-} PostShaderRasteriserData;
-
-vertex PostShaderRasteriserData PostProcessVertexShader(uint vertexID [[vertex_id]],
-                                                        const device PostShaderVertex *vertices [[buffer(0)]]) {
-    PostShaderVertex in = vertices[vertexID];
-    PostShaderRasteriserData out;
-    
-    out.position = float4(float2(in.position), 0.0f, 1.0f);
-    out.texCoord = float2(in.texCoord);
-    return out;
-}
-
-half3 hableOperator(half3 col) {
-    half A = 0.15h;
-    half B = 0.50h;
-    half C = 0.10h;
-    half D = 0.20h;
-    half E = 0.02h;
-    half F = 0.30h;
-    return ((col * (col * A + B * C) + D * E) / (col * (col * A + B) + D * F)) - E / F;
-}
-
-fragment half4 PostProcessFragmentShader(PostShaderRasteriserData in [[stage_in]],
-                                         texture2d<half, access::sample> texture) {
-    
-    constexpr sampler sampler2d(min_filter::nearest,
-                                mag_filter::nearest);
-    
-    half4 sampled = texture.sample(sampler2d, in.texCoord);
-    half3 toneMapped = sampled.rgb * toneMapExposure * 4.0h;
-    toneMapped = hableOperator(toneMapped) / hableOperator(half3(11.2h));
-    
-    return half4(toneMapped, 1.0h);
 }

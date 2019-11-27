@@ -11,13 +11,33 @@ import Metal
 import MetalKit
 import simd
 
+struct TransparentIndex {
+    
+    var transparentSubmeshIndex: Int
+    var alpha: Int
+    
+    init(mesh: MTKMesh, submeshIndex: Int, alpha: Int) {
+        self.transparentSubmeshIndex = submeshIndex
+        self.alpha = alpha
+    }
+    
+}
+
 /// This structure generates draw calls for a given `MTKMesh`.
 struct Mesh {
     
     let mtkMesh: MTKMesh
+    
     let vertexDescriptor: MTLVertexDescriptor?
     
+    var opaqueSubmeshes = Array<Int>()
+    
+    var transparentSubmeshes = Array<TransparentIndex>()
+    
+    var hasTransparency = false
+    
     init(name: String, meshGeometry: MeshGeometry, device: MTLDevice) {
+        
         self.mtkMesh = meshGeometry.mtkMesh
         self.mtkMesh.name = name
         self.vertexDescriptor = MTKMetalVertexDescriptorFromModelIO(meshGeometry.vertexDescriptor)
@@ -25,6 +45,7 @@ struct Mesh {
         
         for (i, submesh) in self.mtkMesh.submeshes.enumerated() {
             submesh.indexBuffer.buffer.label = name + " Index Buffer \(i)"
+            opaqueSubmeshes.append(i)
         }
         
     }
@@ -59,5 +80,6 @@ struct Mesh {
         
         
     }
+    
     
 }

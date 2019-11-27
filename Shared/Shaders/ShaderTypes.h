@@ -65,7 +65,7 @@ typedef struct {
     matrix_float3x3 normalMatrix;
     matrix_float4x4 pad1;
     matrix_float4x4 pad2;
-    matrix_float4x4 pad3;
+    vector_float4 pad3;
 } ObjectTransforms;
 
 typedef struct {

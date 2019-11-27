@@ -31,11 +31,14 @@ struct MosquitoScene: Scene {
                                                            emissiveName: nil)
         
         let mosquitoModel = ResourceManager.loadModel(fromFile: "Mosquito.obj")
+        mosquitoModel.markSubmeshAsTransparent(atIndex: 2, alphaValue: 0)
+        
         var materialArray = Array<Material>(repeating: mosquitoMaterial, count: 2)
         materialArray.append(amberMaterial)
         let mosquitoObject = GameObject(model: mosquitoModel, materials: materialArray)
-        self.addToScene(object: mosquitoObject, position: Maths.originVector)
         
+        
+        self.addToScene(object: mosquitoObject, position: Maths.originVector)
     }
     
 }

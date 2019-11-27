@@ -14,8 +14,8 @@
 		DA54A18F214BECBE007BEEA4 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA54A18E214BECBE007BEEA4 /* AppDelegate.swift */; };
 		DA54A191214BECBE007BEEA4 /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA54A190214BECBE007BEEA4 /* GameViewController.swift */; };
 		DA54A194214BECBE007BEEA4 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DA54A192214BECBE007BEEA4 /* Main.storyboard */; };
-		DA54A196214BECBE007BEEA4 /* Shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = DA54A172214BECBC007BEEA4 /* Shaders.metal */; };
-		DA54A197214BECBE007BEEA4 /* Shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = DA54A172214BECBC007BEEA4 /* Shaders.metal */; };
+		DA54A196214BECBE007BEEA4 /* PBRFunctions.metal in Sources */ = {isa = PBXBuildFile; fileRef = DA54A172214BECBC007BEEA4 /* PBRFunctions.metal */; };
+		DA54A197214BECBE007BEEA4 /* PBRFunctions.metal in Sources */ = {isa = PBXBuildFile; fileRef = DA54A172214BECBC007BEEA4 /* PBRFunctions.metal */; };
 		DA54A198214BECBE007BEEA4 /* Renderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA54A173214BECBC007BEEA4 /* Renderer.swift */; };
 		DA54A199214BECBE007BEEA4 /* Renderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA54A173214BECBC007BEEA4 /* Renderer.swift */; };
 		DA54A19A214BECBE007BEEA4 /* ShaderTypes.h in Resources */ = {isa = PBXBuildFile; fileRef = DA54A174214BECBC007BEEA4 /* ShaderTypes.h */; };
@@ -80,10 +80,14 @@
 		DA5CEF1E22D8A8BA00B476C1 /* Mosquito.mtl in Resources */ = {isa = PBXBuildFile; fileRef = DA5CEF1D22D8A8BA00B476C1 /* Mosquito.mtl */; };
 		DA5CEF1F22D8A8BA00B476C1 /* Mosquito.mtl in Resources */ = {isa = PBXBuildFile; fileRef = DA5CEF1D22D8A8BA00B476C1 /* Mosquito.mtl */; };
 		DA5CEF2222DA33DE00B476C1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DA54A175214BECBE007BEEA4 /* Assets.xcassets */; };
+		DAC64623238E9B1D009C3A83 /* ShaderSupport.metal in Sources */ = {isa = PBXBuildFile; fileRef = DAC64622238E9B1D009C3A83 /* ShaderSupport.metal */; };
+		DAC64624238E9B1D009C3A83 /* ShaderSupport.metal in Sources */ = {isa = PBXBuildFile; fileRef = DAC64622238E9B1D009C3A83 /* ShaderSupport.metal */; };
+		DAC64626238E9D47009C3A83 /* GeneralShaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = DAC64625238E9D47009C3A83 /* GeneralShaders.metal */; };
+		DAC64627238E9D47009C3A83 /* GeneralShaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = DAC64625238E9D47009C3A83 /* GeneralShaders.metal */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		DA54A172214BECBC007BEEA4 /* Shaders.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Shaders.metal; sourceTree = "<group>"; };
+		DA54A172214BECBC007BEEA4 /* PBRFunctions.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = PBRFunctions.metal; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.metal; };
 		DA54A173214BECBC007BEEA4 /* Renderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Renderer.swift; sourceTree = "<group>"; };
 		DA54A174214BECBC007BEEA4 /* ShaderTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ShaderTypes.h; sourceTree = "<group>"; };
 		DA54A175214BECBE007BEEA4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -129,6 +133,8 @@
 		DA5CEF1722D8A5E300B476C1 /* MosquitoScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MosquitoScene.swift; sourceTree = "<group>"; };
 		DA5CEF1A22D8A8B000B476C1 /* Mosquito.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Mosquito.obj; sourceTree = "<group>"; };
 		DA5CEF1D22D8A8BA00B476C1 /* Mosquito.mtl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Mosquito.mtl; sourceTree = "<group>"; };
+		DAC64622238E9B1D009C3A83 /* ShaderSupport.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = ShaderSupport.metal; sourceTree = "<group>"; };
+		DAC64625238E9D47009C3A83 /* GeneralShaders.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = GeneralShaders.metal; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -154,7 +160,7 @@
 			children = (
 				DA5CEF1722D8A5E300B476C1 /* MosquitoScene.swift */,
 				DA5CEEFE22D3703700B476C1 /* RobotScene.swift */,
-				DA54A171214BECBC007BEEA4 /* MetalPBR Shared */,
+				DA54A171214BECBC007BEEA4 /* Shared */,
 				DA54A17C214BECBE007BEEA4 /* MetalPBR iOS */,
 				DA54A18D214BECBE007BEEA4 /* MetalPBR macOS */,
 				DA54A17B214BECBE007BEEA4 /* Products */,
@@ -162,29 +168,20 @@
 			);
 			sourceTree = "<group>";
 		};
-		DA54A171214BECBC007BEEA4 /* MetalPBR Shared */ = {
+		DA54A171214BECBC007BEEA4 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
-				DA54A1AC214BEDB3007BEEA4 /* Camera.swift */,
+				DAC6462A238EA04E009C3A83 /* Scene Management */,
+				DAC64629238E9FFC009C3A83 /* Resource Management */,
+				DAC64628238E9EB7009C3A83 /* Shaders */,
 				DA54A1B8214BEE4A007BEEA4 /* ConvenienceExtensions.swift */,
 				DA54A1AF214BEDE1007BEEA4 /* KeyCodes.swift */,
-				DA54A1CA214BEF28007BEEA4 /* Material.swift */,
 				DA54A1A6214BED69007BEEA4 /* Maths.swift */,
-				DA54A1BE214BEE97007BEEA4 /* Mesh.swift */,
-				DA54A1C7214BEF10007BEEA4 /* GameObject.swift */,
 				DA54A173214BECBC007BEEA4 /* Renderer.swift */,
-				DA54A1C4214BEEE9007BEEA4 /* SceneAsset.swift */,
-				DA54A172214BECBC007BEEA4 /* Shaders.metal */,
-				DA54A174214BECBC007BEEA4 /* ShaderTypes.h */,
-				DA54A1C1214BEEC3007BEEA4 /* Skybox.swift */,
-				DA54A1BB214BEE77007BEEA4 /* Texture.swift */,
 				DA54A1B5214BEE25007BEEA4 /* UserInputs.swift */,
 				DA54A175214BECBE007BEEA4 /* Assets.xcassets */,
-				DA5CEEFB22D36FA500B476C1 /* Scene.swift */,
-				DA5CEF0122D3726600B476C1 /* ResourceManager.swift */,
-				DA5CEF0422D374F900B476C1 /* Model.swift */,
 			);
-			path = "MetalPBR Shared";
+			path = Shared;
 			sourceTree = "<group>";
 		};
 		DA54A17B214BECBE007BEEA4 /* Products */ = {
@@ -263,6 +260,41 @@
 				DA5CEF1D22D8A8BA00B476C1 /* Mosquito.mtl */,
 			);
 			path = Mosquito;
+			sourceTree = "<group>";
+		};
+		DAC64628238E9EB7009C3A83 /* Shaders */ = {
+			isa = PBXGroup;
+			children = (
+				DA54A174214BECBC007BEEA4 /* ShaderTypes.h */,
+				DA54A172214BECBC007BEEA4 /* PBRFunctions.metal */,
+				DAC64625238E9D47009C3A83 /* GeneralShaders.metal */,
+				DAC64622238E9B1D009C3A83 /* ShaderSupport.metal */,
+			);
+			path = Shaders;
+			sourceTree = "<group>";
+		};
+		DAC64629238E9FFC009C3A83 /* Resource Management */ = {
+			isa = PBXGroup;
+			children = (
+				DA54A1CA214BEF28007BEEA4 /* Material.swift */,
+				DA54A1BE214BEE97007BEEA4 /* Mesh.swift */,
+				DA54A1C4214BEEE9007BEEA4 /* SceneAsset.swift */,
+				DA54A1BB214BEE77007BEEA4 /* Texture.swift */,
+				DA5CEF0122D3726600B476C1 /* ResourceManager.swift */,
+				DA5CEF0422D374F900B476C1 /* Model.swift */,
+			);
+			path = "Resource Management";
+			sourceTree = "<group>";
+		};
+		DAC6462A238EA04E009C3A83 /* Scene Management */ = {
+			isa = PBXGroup;
+			children = (
+				DA54A1AC214BEDB3007BEEA4 /* Camera.swift */,
+				DA54A1C7214BEF10007BEEA4 /* GameObject.swift */,
+				DA54A1C1214BEEC3007BEEA4 /* Skybox.swift */,
+				DA5CEEFB22D36FA500B476C1 /* Scene.swift */,
+			);
+			path = "Scene Management";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -393,12 +425,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				DA5CEF0522D374F900B476C1 /* Model.swift in Sources */,
+				DAC64623238E9B1D009C3A83 /* ShaderSupport.metal in Sources */,
 				DA54A198214BECBE007BEEA4 /* Renderer.swift in Sources */,
 				DA54A1BF214BEE97007BEEA4 /* Mesh.swift in Sources */,
 				DA54A1BC214BEE77007BEEA4 /* Texture.swift in Sources */,
 				DA54A1D0214BF046007BEEA4 /* TouchInput.swift in Sources */,
 				DA54A1B0214BEDE1007BEEA4 /* KeyCodes.swift in Sources */,
-				DA54A196214BECBE007BEEA4 /* Shaders.metal in Sources */,
+				DA54A196214BECBE007BEEA4 /* PBRFunctions.metal in Sources */,
 				DA54A1AD214BEDB3007BEEA4 /* Camera.swift in Sources */,
 				DA54A180214BECBE007BEEA4 /* GameViewController.swift in Sources */,
 				DA5CEEFC22D36FA500B476C1 /* Scene.swift in Sources */,
@@ -412,6 +445,7 @@
 				DA54A1B9214BEE4A007BEEA4 /* ConvenienceExtensions.swift in Sources */,
 				DA54A1A7214BED69007BEEA4 /* Maths.swift in Sources */,
 				DA54A17E214BECBE007BEEA4 /* AppDelegate.swift in Sources */,
+				DAC64626238E9D47009C3A83 /* GeneralShaders.metal in Sources */,
 				DA54A1CE214BF01D007BEEA4 /* CameraController.swift in Sources */,
 				DA54A1C8214BEF10007BEEA4 /* GameObject.swift in Sources */,
 			);
@@ -422,11 +456,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				DA5CEF0622D374F900B476C1 /* Model.swift in Sources */,
+				DAC64624238E9B1D009C3A83 /* ShaderSupport.metal in Sources */,
 				DA54A199214BECBE007BEEA4 /* Renderer.swift in Sources */,
 				DA54A1C0214BEE97007BEEA4 /* Mesh.swift in Sources */,
 				DA54A1BD214BEE77007BEEA4 /* Texture.swift in Sources */,
 				DA54A1B1214BEDE1007BEEA4 /* KeyCodes.swift in Sources */,
-				DA54A197214BECBE007BEEA4 /* Shaders.metal in Sources */,
+				DA54A197214BECBE007BEEA4 /* PBRFunctions.metal in Sources */,
 				DA54A1AE214BEDB3007BEEA4 /* Camera.swift in Sources */,
 				DA54A191214BECBE007BEEA4 /* GameViewController.swift in Sources */,
 				DA54A1C3214BEEC3007BEEA4 /* Skybox.swift in Sources */,
@@ -441,6 +476,7 @@
 				DA54A1BA214BEE4A007BEEA4 /* ConvenienceExtensions.swift in Sources */,
 				DA54A1A8214BED69007BEEA4 /* Maths.swift in Sources */,
 				DA54A18F214BECBE007BEEA4 /* AppDelegate.swift in Sources */,
+				DAC64627238E9D47009C3A83 /* GeneralShaders.metal in Sources */,
 				DA54A1D2214BF0A5007BEEA4 /* CameraController.swift in Sources */,
 				DA54A1C9214BEF10007BEEA4 /* GameObject.swift in Sources */,
 			);
@@ -596,10 +632,11 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				PRODUCT_BUNDLE_IDENTIFIER = adilPatel.MetalPBR;
 				PRODUCT_NAME = MetalPBR;
 				SDKROOT = iphoneos;
-				SWIFT_OBJC_BRIDGING_HEADER = "MetalPBR Shared/ShaderTypes.h";
+				SWIFT_OBJC_BRIDGING_HEADER = Shared/Shaders/ShaderTypes.h;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -621,7 +658,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = adilPatel.MetalPBR;
 				PRODUCT_NAME = MetalPBR;
 				SDKROOT = iphoneos;
-				SWIFT_OBJC_BRIDGING_HEADER = "MetalPBR Shared/ShaderTypes.h";
+				SWIFT_OBJC_BRIDGING_HEADER = Shared/Shaders/ShaderTypes.h;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
@@ -642,10 +679,11 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				PRODUCT_BUNDLE_IDENTIFIER = adilPatel.MetalPBR;
 				PRODUCT_NAME = MetalPBR;
 				SDKROOT = macosx;
-				SWIFT_OBJC_BRIDGING_HEADER = "MetalPBR Shared/ShaderTypes.h";
+				SWIFT_OBJC_BRIDGING_HEADER = Shared/Shaders/ShaderTypes.h;
 				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
@@ -667,7 +705,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = adilPatel.MetalPBR;
 				PRODUCT_NAME = MetalPBR;
 				SDKROOT = macosx;
-				SWIFT_OBJC_BRIDGING_HEADER = "MetalPBR Shared/ShaderTypes.h";
+				SWIFT_OBJC_BRIDGING_HEADER = Shared/Shaders/ShaderTypes.h;
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;

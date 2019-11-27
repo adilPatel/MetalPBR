@@ -16,6 +16,7 @@ import simd
 struct GameObject {
     
     let mesh: Mesh
+    
     let materials: [Material]
     
     init(mesh: Mesh, materials: [Material]) {
@@ -39,6 +40,31 @@ struct GameObject {
         }
         
     }
+    
+    func drawOpaqueSubmeshes(atSubmeshIndex submeshIndex: Int, usingEncoder encoder: MTLRenderCommandEncoder, constantBufferOffset offset: Int) {
+        
+        mesh.bindToVertexShader(encoder: encoder)
+        encoder.setVertexBufferOffset(offset, index: BufferIndex.localUniforms.rawValue)
+        
+        for i in mesh.opaqueSubmeshes {
+            materials[i].bindTexturesToShader(encoder: encoder)
+            mesh.drawSubmesh(atIndex: i, encoder: encoder)
+        }
+        
+    }
+    
+    func drawTransparentSubmeshes(usingEncoder encoder: MTLRenderCommandEncoder, constantBufferOffset offset: Int) {
+        
+        mesh.bindToVertexShader(encoder: encoder)
+        encoder.setVertexBufferOffset(offset, index: BufferIndex.localUniforms.rawValue)
+        
+        for index in mesh.transparentSubmeshes {
+            materials[index.transparentSubmeshIndex].bindAlbedoToShader(encoder: encoder)
+            mesh.drawSubmesh(atIndex: index.transparentSubmeshIndex, encoder: encoder)
+        }
+        
+    }
+    
     
     func draw(atSubmeshIndex submeshIndex: Int, usingEncoder encoder: MTLRenderCommandEncoder, constantBufferOffset offset: Int) {
         

@@ -14,7 +14,7 @@ import simd
 
 /// This structure holds all the textures required for a physically-based material. If a texture is not supplied, a blank one will be created.
 struct Material {
-    
+       
     var baseColour = Texture()
     var ambientOcclusion = Texture()
     var metallic   = Texture()
@@ -73,6 +73,11 @@ struct Material {
         
         
     }
+    
+    func bindAlbedoToShader(encoder: MTLRenderCommandEncoder) {
+        baseColour.bindToFragmentShader(withDefault: Texture.blackColour, encoder: encoder, index: TextureIndex.albedo.rawValue)
+    }
+    
     
     func bindTexturesToShader(encoder: MTLRenderCommandEncoder) {
         

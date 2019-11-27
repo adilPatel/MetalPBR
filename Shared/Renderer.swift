@@ -42,9 +42,19 @@ class Renderer: NSObject, MTKViewDelegate, SceneResponderDelegate {
     /// The Metal render pipeline state
     var meshPipelineState: MTLRenderPipelineState!
     
+    var backfacePipelineState: MTLRenderPipelineState!
+    
+    var frontfacePipelineState: MTLRenderPipelineState!
+    
     /// The Metal depth stencil state
     var depthState: MTLDepthStencilState
     
+    var backfaceDepthState: MTLDepthStencilState
+    
+    var frontfaceDepthState: MTLDepthStencilState
+    
+    var opaqueDepthState: MTLDepthStencilState
+        
     /// The Metal command queue
     let commandQueue: MTLCommandQueue
     
@@ -89,12 +99,15 @@ class Renderer: NSObject, MTKViewDelegate, SceneResponderDelegate {
     
     /// The MSAA resolved depth target
     var depthResolvedTarget: MTLTexture!
-    
+        
     /// The render pipeline state for the final render pass
     var finalRenderPipelineState: MTLRenderPipelineState!
     
-    /// The array full of game objects we'll draw
+    /// The array of opaque game objects we'll draw
     var gameObjects = Array<GameObject>()
+    
+    /// The array of transparent objects we'll draw
+    var transparentObjects = Array<GameObject>()
     
     /// The texture of the environment that'll reflect off the object
     var environmentTexture: Texture!
@@ -128,6 +141,26 @@ class Renderer: NSObject, MTKViewDelegate, SceneResponderDelegate {
         depthStateDesciptor.label = "Main Depth State"
         guard let state = device.makeDepthStencilState(descriptor:depthStateDesciptor) else { return nil }
         depthState = state
+        opaqueDepthState = state
+        
+        // We don't want to write the depth buffer values when rendering the front of translucent objects because
+        // we read them in the shader post-rasterisation. In this example, depth buffer writes aren't needed
+        // anyways, so let's create another render pipeline state!
+        
+        let backDepthDescriptor = MTLDepthStencilDescriptor()
+        backDepthDescriptor.depthCompareFunction = .less
+        backDepthDescriptor.isDepthWriteEnabled = true
+        backDepthDescriptor.label = "Backface mesh depth state"
+        guard let backDepth = device.makeDepthStencilState(descriptor: backDepthDescriptor) else { return nil }
+        backfaceDepthState = backDepth
+        
+        let frontDepthDescriptor = MTLDepthStencilDescriptor()
+        frontDepthDescriptor.depthCompareFunction = .less
+        frontDepthDescriptor.isDepthWriteEnabled = false
+        frontDepthDescriptor.label = "Frontface mesh depth state"
+        guard let frontDepth = device.makeDepthStencilState(descriptor: frontDepthDescriptor) else { return nil }
+        frontfaceDepthState = frontDepth
+        
         
         sampler = Sampler(descriptor: createSamplerDescriptor(), device: device)
         
@@ -220,7 +253,52 @@ class Renderer: NSObject, MTKViewDelegate, SceneResponderDelegate {
         do {
             try meshPipelineState = device.makeRenderPipelineState(descriptor: pipelineDescriptor)
         } catch let error {
-            print("ERROR: Failed to create the render pipeline state with error:\n\(error)")
+            print("ERROR: Failed to create the main render pipeline state with error:\n\(error)")
+        }
+        
+        let transparentVertexFunction = library?.makeFunction(name: "transparencyVertexShader")
+        let backfaceFragmentFunction  = library?.makeFunction(name: "backfaceFragmentShader")
+        let frontfaceFragmentFunction = library?.makeFunction(name: "frontfaceFragmentShader")
+        
+        let backfacePipelineDescriptor = MTLRenderPipelineDescriptor()
+        backfacePipelineDescriptor.vertexFunction = transparentVertexFunction
+        backfacePipelineDescriptor.fragmentFunction = backfaceFragmentFunction
+        backfacePipelineDescriptor.colorAttachments[0].pixelFormat = colourResolvedTarget.pixelFormat
+        backfacePipelineDescriptor.colorAttachments[0].isBlendingEnabled = true
+        backfacePipelineDescriptor.colorAttachments[0].rgbBlendOperation = .add
+        backfacePipelineDescriptor.colorAttachments[0].alphaBlendOperation = .add
+        backfacePipelineDescriptor.colorAttachments[0].sourceRGBBlendFactor = .sourceAlpha
+        backfacePipelineDescriptor.colorAttachments[0].sourceAlphaBlendFactor = .sourceAlpha
+        backfacePipelineDescriptor.colorAttachments[0].destinationRGBBlendFactor = .oneMinusSourceAlpha
+        backfacePipelineDescriptor.colorAttachments[0].destinationAlphaBlendFactor = .oneMinusSourceAlpha
+        backfacePipelineDescriptor.depthAttachmentPixelFormat = .depth32Float
+        backfacePipelineDescriptor.sampleCount = sampleCount
+        backfacePipelineDescriptor.vertexDescriptor = gameObjects[0].mesh.vertexDescriptor
+        backfacePipelineDescriptor.label = "Backface Pipeline State"
+        
+        do {
+            try backfacePipelineState = device.makeRenderPipelineState(descriptor: backfacePipelineDescriptor)
+        } catch let error {
+            print("ERROR: Failed to create the backface render pipeline state with error:\n\(error)")
+        }
+        
+        let frontfacePipelineDescriptor = MTLRenderPipelineDescriptor()
+        frontfacePipelineDescriptor.vertexFunction = transparentVertexFunction
+        frontfacePipelineDescriptor.fragmentFunction = frontfaceFragmentFunction
+        frontfacePipelineDescriptor.colorAttachments[0].pixelFormat = colourResolvedTarget.pixelFormat
+        frontfacePipelineDescriptor.colorAttachments[0].isBlendingEnabled = true
+        frontfacePipelineDescriptor.colorAttachments[0].rgbBlendOperation = .add
+        frontfacePipelineDescriptor.colorAttachments[0].sourceRGBBlendFactor = .one
+        frontfacePipelineDescriptor.colorAttachments[0].destinationRGBBlendFactor = .source1Color
+        frontfacePipelineDescriptor.depthAttachmentPixelFormat = .depth32Float
+        frontfacePipelineDescriptor.sampleCount = sampleCount
+        frontfacePipelineDescriptor.vertexDescriptor = gameObjects[0].mesh.vertexDescriptor
+        frontfacePipelineDescriptor.label = "Frontface Pipeline State"
+        
+        do {
+            try frontfacePipelineState = device.makeRenderPipelineState(descriptor: frontfacePipelineDescriptor)
+        } catch let error {
+            print("ERROR: Failed to create the frontface render pipeline state with error:\n\(error)")
         }
         
     }
@@ -228,7 +306,7 @@ class Renderer: NSObject, MTKViewDelegate, SceneResponderDelegate {
     func addedToScene(object: GameObject, position: SIMD3<Float>) {
         
         // Add the object to the rendering queue along with its position...
-        gameObjects.append(object)
+        
         let modelMatrix = Maths.createTranslationMatrix(vector: position)
         modelMatrices.append(modelMatrix)
         
@@ -237,6 +315,8 @@ class Renderer: NSObject, MTKViewDelegate, SceneResponderDelegate {
         transform.modelViewMatrix = cameraController.camera.currentViewMatrix * modelMatrix
         transform.normalMatrix = Maths.createNormalMatrix(fromMVMatrix: transform.modelViewMatrix)
         objectTransforms.append(transform)
+        
+        gameObjects.append(object)
         
     }
     
@@ -302,7 +382,6 @@ class Renderer: NSObject, MTKViewDelegate, SceneResponderDelegate {
     
     
     func draw(in view: MTKView) {
-        /// Per frame updates hare
         
         // Halt the execution of this function until the semaphore is signalled
         let _ = semaphore.wait(timeout: .distantFuture)
@@ -347,27 +426,73 @@ class Renderer: NSObject, MTKViewDelegate, SceneResponderDelegate {
             
             let constantBuffer = constantBuffers[constantBufferIndex]
             
+            firstPassRenderEncoder.pushDebugGroup("Setting local uniforms and per-frame constant")
             firstPassRenderEncoder.setVertexBuffer(constantBuffer, offset: 0, index: BufferIndex.localUniforms.rawValue)
             firstPassRenderEncoder.setVertexBuffer(constantBuffer, offset: 0, index: BufferIndex.perFrameConstants.rawValue)
             firstPassRenderEncoder.setFragmentBuffer(constantBuffer, offset: 0, index: BufferIndex.perFrameConstants.rawValue)
             firstPassRenderEncoder.setFragmentTexture(skybox.texture, index: TextureIndex.irradiance.rawValue)
+            firstPassRenderEncoder.popDebugGroup()
+            
             
             // Below looks kinda complex, but it really isn't. All we do is iterate though all meshes,
             // bind their constants to the shaders, and then draw them. We increment the buffer offset in each
             // step to select the correct region of the constant buffer
+            
             var offset = MemoryLayout<PerFrameConstants>.stride
             let stride = MemoryLayout<ObjectTransforms>.stride
-            for (_, object) in gameObjects.enumerated() {
+            
+            // First we draw the opaque objects...
+            firstPassRenderEncoder.pushDebugGroup("Drawing the opaque objects")
+            firstPassRenderEncoder.setCullMode(.back) // Cull out the front
+            firstPassRenderEncoder.setDepthStencilState(opaqueDepthState)
+            for (i, object) in gameObjects.enumerated() {
                 firstPassRenderEncoder.pushDebugGroup("Working on \(object.mesh.mtkMesh.name)")
                 
-                object.draw(usingEncoder: firstPassRenderEncoder, constantBufferOffset: offset)
+                object.draw(atSubmeshIndex: i, usingEncoder: firstPassRenderEncoder, constantBufferOffset: offset)
                 
                 offset += stride
                 firstPassRenderEncoder.popDebugGroup()
             }
+            firstPassRenderEncoder.popDebugGroup()
+            
+            let opaqueOffset = offset
+                        
+            // Then we draw the back of transparent objects...
+            firstPassRenderEncoder.pushDebugGroup("Drawing the back of transparent objects")
+            firstPassRenderEncoder.setRenderPipelineState(backfacePipelineState)
+            firstPassRenderEncoder.setCullMode(.front) // Cull out the front
+            firstPassRenderEncoder.setDepthStencilState(backfaceDepthState)
+            for object in gameObjects {
+                firstPassRenderEncoder.pushDebugGroup("Working on back of \(object.mesh.mtkMesh.name)")
+
+                object.drawTransparentSubmeshes(usingEncoder: firstPassRenderEncoder, constantBufferOffset: offset)
+
+                offset += stride
+                firstPassRenderEncoder.popDebugGroup()
+            }
+            firstPassRenderEncoder.popDebugGroup()
+            
+            offset = opaqueOffset
+            
+            // Finally, draw the front of the transparent objects...
+            firstPassRenderEncoder.pushDebugGroup("Drawing the front of the transparent objects")
+            firstPassRenderEncoder.setRenderPipelineState(frontfacePipelineState)
+            firstPassRenderEncoder.setCullMode(.back) // Cull out the back
+            firstPassRenderEncoder.setDepthStencilState(frontfaceDepthState)
+            firstPassRenderEncoder.setFragmentTexture(depthResolvedTarget, index: 1)
+            for object in gameObjects {
+                firstPassRenderEncoder.pushDebugGroup("Working on front of \(object.mesh.mtkMesh.name)")
+
+                object.drawTransparentSubmeshes(usingEncoder: firstPassRenderEncoder, constantBufferOffset: offset)
+
+                offset += stride
+                firstPassRenderEncoder.popDebugGroup()
+            }
+            firstPassRenderEncoder.popDebugGroup()
+
+            
             
             firstPassRenderEncoder.endEncoding()
-            
             
             // Now for the second pass, after rendering
             let postRenderPassDescriptor = view.currentRenderPassDescriptor!
@@ -463,9 +588,10 @@ class Renderer: NSObject, MTKViewDelegate, SceneResponderDelegate {
                                                                               width: width,
                                                                               height: height,
                                                                               mipmapped: false)
-        depthTextureDescriptor.usage = .renderTarget
+        depthTextureDescriptor.usage = MTLTextureUsage(rawValue: MTLTextureUsage.renderTarget.rawValue | MTLTextureUsage.shaderRead.rawValue)
         depthTextureDescriptor.resourceOptions = .storageModePrivate
         depthResolvedTarget = device.makeTexture(descriptor: depthTextureDescriptor)
+        
         
     }
     
