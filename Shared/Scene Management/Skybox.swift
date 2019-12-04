@@ -118,7 +118,6 @@ struct Skybox {
         
         // The difference here is that we're using different shaders and a different vertex descriptor
         let pipelineDescriptor = MTLRenderPipelineDescriptor()
-        pipelineDescriptor.sampleCount = sampleCount
         pipelineDescriptor.vertexFunction = vertexFunction
         pipelineDescriptor.fragmentFunction = fragmentFunction
         pipelineDescriptor.colorAttachments[0].pixelFormat = colourPixelFormat

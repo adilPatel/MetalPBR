@@ -78,6 +78,9 @@ struct Material {
         baseColour.bindToFragmentShader(withDefault: Texture.blackColour, encoder: encoder, index: TextureIndex.albedo.rawValue)
     }
     
+    func bindNormalToShader(encoder: MTLRenderCommandEncoder) {
+        normal.bindToFragmentShader(withDefault: Texture.blankNormalMap, encoder: encoder, index: TextureIndex.normal.rawValue)
+    }
     
     func bindTexturesToShader(encoder: MTLRenderCommandEncoder) {
         

@@ -16,7 +16,13 @@
 using namespace metal;
 
 // Light and material data
-constant half3 directionalLightInvDirection = half3(0.0h, 1.0h, 0.0h);;
+constant half3 directionalLightInvDirection = half3(0.0h, 1.0h, 0.0h);
+
+// Material transparency parameters
+constant bool is_backface  [[function_constant(FunctionConstantBackface)]];
+constant bool is_frontface [[function_constant(FunctionConstantFrontface)]];
+constant half refractorJitterFactor = 0.05h;
+constant half3 extinction = half3(0.056h, 0.153h, 0.408h);
 
 #define SRGB_ALPHA 0.055h
 
@@ -75,10 +81,11 @@ static half Geometry(half NdotV, half alphaG) {
 
 static half TRNDF(half NdotH, half roughness) {
     
-    half roughnessSqr = roughness * roughness;
+    float NdotH_F = float(NdotH);
+    float roughnessSqr = float(roughness) * float(roughness);
     
-    half d = (NdotH * roughnessSqr - NdotH) * NdotH + 1.0h;
-    return roughnessSqr / (M_PI_H * d * d);
+    float d = (NdotH_F * roughnessSqr - NdotH_F) * NdotH_F + 1.0f;
+    return half(roughnessSqr / (M_PI_F * d * d));
 }
 
 static half TrowbridgeReitzNDF(half NdotH, half roughness) {
@@ -109,6 +116,8 @@ fragment half4 helloFragmentShader(VertexOut in                         [[stage_
                                    texture2d<float> metallicMap         [[texture(TextureIndexMetallic)]],
                                    texture2d<float> normalMap           [[texture(TextureIndexNormal)]],
                                    texture2d<float> roughnessMap        [[texture(TextureIndexRoughness)]],
+                                   depth2d<float> sceneDepth            [[texture(TextureIndexDepth), function_constant(is_frontface)]],
+                                   texture2d<half>  refractorInput      [[texture(TextureIndexColour), function_constant(is_frontface)]],
                                    texturecube<float> irradianceMap     [[texture(TextureIndexIrradiance)]]) {
     
     constexpr sampler linearSampler (mip_filter::linear, mag_filter::linear, min_filter::linear);
@@ -146,7 +155,39 @@ fragment half4 helloFragmentShader(VertexOut in                         [[stage_
     half3 emissivecolour = half3(emissiveMap.sample(linearSampler, in.texCoords).rgb);
     
     half3 colour = diffuseTerm(parameters) + specularTerm(parameters) + emissivecolour;
+    half alpha = basecolour.a;
     
-    return half4(colour, basecolour.a);
+    // If it's the frontface, we need to compute the refraction
+    if (is_frontface) {
+        
+        float4 position = in.position;
+        
+        half width = half(refractorInput.get_width());
+        half height = half(refractorInput.get_height());
+        half2 screenUV = half2(position.xy) / half2(width, height);
+        
+        float4x4 projectionMatrix = uniforms.projectionMatrix;
+        half p22 = half(projectionMatrix[2][2]);
+        half p23 = half(projectionMatrix[3][2]);
+        
+        half depth = half(sceneDepth.sample(linearSampler, float2(screenUV)));
+            
+        half linearBackDepth  = p23 / (depth + p22);
+        half linearFrontDepth = p23 / (half(position.z) + p22);
+        half3 transmittance = exp((linearFrontDepth - linearBackDepth) / 0.1h * extinction);
+        
+        // Now we compute the refraction. We grab the normal then apply a jitter, from
+        // which we sample the refractorInput texture...
+        // See https://developer.nvidia.com/gpugems/GPUGems2/gpugems2_chapter19.html
+        float2 refractorUV = float2(screenUV + refractorJitterFactor * mapNormal.xy);
+        half3 refracted = refractorInput.sample(linearSampler, refractorUV).rgb;
+        
+        colour = colour + transmittance * refracted;;
+        
+    } else if (is_backface) {
+        alpha = 0.75h; // Self-explanatory
+    }
+    
+    return half4(colour, alpha);
     
 }

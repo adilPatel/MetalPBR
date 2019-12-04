@@ -59,12 +59,11 @@ struct GameObject {
         encoder.setVertexBufferOffset(offset, index: BufferIndex.localUniforms.rawValue)
         
         for index in mesh.transparentSubmeshes {
-            materials[index.transparentSubmeshIndex].bindAlbedoToShader(encoder: encoder)
+            materials[index.transparentSubmeshIndex].bindTexturesToShader(encoder: encoder)
             mesh.drawSubmesh(atIndex: index.transparentSubmeshIndex, encoder: encoder)
         }
         
     }
-    
     
     func draw(atSubmeshIndex submeshIndex: Int, usingEncoder encoder: MTLRenderCommandEncoder, constantBufferOffset offset: Int) {
         

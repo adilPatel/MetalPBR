@@ -18,12 +18,6 @@ enum RendererError: Error {
 
 let buffersInFlight = 3
 
-#if os(iOS)
-let sampleCount = 2
-#else
-let sampleCount = 4
-#endif
-
 class Renderer: NSObject, MTKViewDelegate, SceneResponderDelegate {
     
     /// A handle to our device (which is the GPU)
@@ -32,27 +26,34 @@ class Renderer: NSObject, MTKViewDelegate, SceneResponderDelegate {
     /// Controls our camera
     public var cameraController: CameraController!
     
+    /// The size of the `MTKView` used to draw into
     let viewSize: CGSize
     
     /// The scene we're rendering
     var scene: Scene
     
+    /// The default shader library
     var library: MTLLibrary?
     
-    /// The Metal render pipeline state
+    /// The render pipeline state used when drawing opaque meshes
     var meshPipelineState: MTLRenderPipelineState!
     
+    /// The render pipeline state used when drawing the back of solid transparent meshes
     var backfacePipelineState: MTLRenderPipelineState!
     
+    /// The render pipeline state used when drawing the front of solid transparent meshes
     var frontfacePipelineState: MTLRenderPipelineState!
     
     /// The Metal depth stencil state
     var depthState: MTLDepthStencilState
     
+    /// The depth stencil state used when drawing the back of solid transparent meshes
     var backfaceDepthState: MTLDepthStencilState
     
+    /// The depth stencil state used when drawing the front of transparent meshes
     var frontfaceDepthState: MTLDepthStencilState
     
+    /// The depth stencil state used when drawing opaque object
     var opaqueDepthState: MTLDepthStencilState
         
     /// The Metal command queue
@@ -88,17 +89,17 @@ class Renderer: NSObject, MTKViewDelegate, SceneResponderDelegate {
     /// The textures for each object
     var textures = Array<Texture>()
     
-    /// This is the colour render target containing multiple samples
-    var colourMultisampleTarget: MTLTexture!
+    /// A copy of the render colour attachment used to calculate refraction
+    var refractorInputTexture: MTLTexture!
     
-    /// This is the depth render target containing multiple samples
-    var depthMultisampleTarget: MTLTexture!
+    /// A copy of the render depth attachment used to calculate attenuation
+    var refractorDepthTexture: MTLTexture!
     
     /// The MSAA resolved colour target
-    var colourResolvedTarget: MTLTexture!
+    var colourTarget: MTLTexture!
     
     /// The MSAA resolved depth target
-    var depthResolvedTarget: MTLTexture!
+    var depthTarget: MTLTexture!
         
     /// The render pipeline state for the final render pass
     var finalRenderPipelineState: MTLRenderPipelineState!
@@ -114,6 +115,7 @@ class Renderer: NSObject, MTKViewDelegate, SceneResponderDelegate {
     
     /// The texture loader for the material textures of the objects
     let materialTextureLoader: MTKTextureLoader
+    
     
     /// Our semaphore for triple buffering
     var semaphore = DispatchSemaphore(value: buffersInFlight)
@@ -184,7 +186,7 @@ class Renderer: NSObject, MTKViewDelegate, SceneResponderDelegate {
         skybox = Skybox(device: device,
                         vertexFunction: skyboxVertexFunction,
                         fragmentFunction: skyboxFragmentFunction,
-                        colourPixelFormat: colourResolvedTarget.pixelFormat,
+                        colourPixelFormat: colourTarget.pixelFormat,
                         depthStencilPixelFormat: .depth32Float)
         
         
@@ -208,6 +210,7 @@ class Renderer: NSObject, MTKViewDelegate, SceneResponderDelegate {
         
     }
     
+    /// This function executes the scene initialiser, allocates uniform buffers, and builds pipeline states
     func initialiseScene() {
         
         scene.sceneInit()
@@ -237,17 +240,27 @@ class Renderer: NSObject, MTKViewDelegate, SceneResponderDelegate {
         
         // We're creating handles to the shaders...
         let vertexFunction = library?.makeFunction(name: "helloVertexShader")
-        let fragmentFunction = library?.makeFunction(name: "helloFragmentShader")
+        var wrongSide = false
+        var rightSide = true
+        
+        let opaqueConstantValues = MTLFunctionConstantValues()
+        opaqueConstantValues.setConstantValue(&wrongSide, type: .bool, index: FunctionConstant.backface.rawValue)
+        opaqueConstantValues.setConstantValue(&wrongSide, type: .bool, index: FunctionConstant.frontface.rawValue)
+        var opaqueFragmentFunction: MTLFunction?
+        do {
+            try opaqueFragmentFunction = library?.makeFunction(name: "helloFragmentShader", constantValues: opaqueConstantValues)
+        } catch {
+            print("ERROR: Could not create opaque fragment function with error: \(error)")
+        }
         
         // Here we create the render pipeline state. However, Metal doesn't allow
         // us to create one directly; we must use a descriptor
         let pipelineDescriptor = MTLRenderPipelineDescriptor()
         pipelineDescriptor.vertexFunction = vertexFunction
-        pipelineDescriptor.fragmentFunction = fragmentFunction
-        pipelineDescriptor.colorAttachments[0].pixelFormat = colourResolvedTarget.pixelFormat
+        pipelineDescriptor.fragmentFunction = opaqueFragmentFunction
+        pipelineDescriptor.colorAttachments[0].pixelFormat = colourTarget.pixelFormat
         pipelineDescriptor.depthAttachmentPixelFormat = .depth32Float
         pipelineDescriptor.vertexDescriptor = gameObjects[0].mesh.vertexDescriptor
-        pipelineDescriptor.sampleCount = sampleCount
         pipelineDescriptor.label = "Main Render Pipeline State"
         
         do {
@@ -256,14 +269,33 @@ class Renderer: NSObject, MTKViewDelegate, SceneResponderDelegate {
             print("ERROR: Failed to create the main render pipeline state with error:\n\(error)")
         }
         
-        let transparentVertexFunction = library?.makeFunction(name: "transparencyVertexShader")
-        let backfaceFragmentFunction  = library?.makeFunction(name: "backfaceFragmentShader")
-        let frontfaceFragmentFunction = library?.makeFunction(name: "frontfaceFragmentShader")
+        // Create the fragment shader for the backface...
+        let backfaceConstantValues = MTLFunctionConstantValues()
+        backfaceConstantValues.setConstantValue(&rightSide, type: .bool, index: FunctionConstant.backface.rawValue)
+        backfaceConstantValues.setConstantValue(&wrongSide, type: .bool, index: FunctionConstant.frontface.rawValue)
+        var backfaceFragmentFunction: MTLFunction?
+        do {
+            try backfaceFragmentFunction = library?.makeFunction(name: "helloFragmentShader", constantValues: backfaceConstantValues)
+        } catch {
+            print("ERROR: Could not create backface fragment function with error: \(error)")
+        }
         
+        // Now for the front...
+        let frontfaceConstantValues = MTLFunctionConstantValues()
+        frontfaceConstantValues.setConstantValue(&wrongSide, type: .bool, index: FunctionConstant.backface.rawValue)
+        frontfaceConstantValues.setConstantValue(&rightSide, type: .bool, index: FunctionConstant.frontface.rawValue)
+        var frontfaceFragmentFunction: MTLFunction?
+        do {
+            try frontfaceFragmentFunction = library?.makeFunction(name: "helloFragmentShader", constantValues: frontfaceConstantValues)
+        } catch {
+            print("ERROR: Could not create frontface fragment function with error: \(error)")
+        }
+        
+        // Constructing the back of solid transparent meshes
         let backfacePipelineDescriptor = MTLRenderPipelineDescriptor()
-        backfacePipelineDescriptor.vertexFunction = transparentVertexFunction
+        backfacePipelineDescriptor.vertexFunction = vertexFunction
         backfacePipelineDescriptor.fragmentFunction = backfaceFragmentFunction
-        backfacePipelineDescriptor.colorAttachments[0].pixelFormat = colourResolvedTarget.pixelFormat
+        backfacePipelineDescriptor.colorAttachments[0].pixelFormat = colourTarget.pixelFormat
         backfacePipelineDescriptor.colorAttachments[0].isBlendingEnabled = true
         backfacePipelineDescriptor.colorAttachments[0].rgbBlendOperation = .add
         backfacePipelineDescriptor.colorAttachments[0].alphaBlendOperation = .add
@@ -272,7 +304,6 @@ class Renderer: NSObject, MTKViewDelegate, SceneResponderDelegate {
         backfacePipelineDescriptor.colorAttachments[0].destinationRGBBlendFactor = .oneMinusSourceAlpha
         backfacePipelineDescriptor.colorAttachments[0].destinationAlphaBlendFactor = .oneMinusSourceAlpha
         backfacePipelineDescriptor.depthAttachmentPixelFormat = .depth32Float
-        backfacePipelineDescriptor.sampleCount = sampleCount
         backfacePipelineDescriptor.vertexDescriptor = gameObjects[0].mesh.vertexDescriptor
         backfacePipelineDescriptor.label = "Backface Pipeline State"
         
@@ -282,16 +313,16 @@ class Renderer: NSObject, MTKViewDelegate, SceneResponderDelegate {
             print("ERROR: Failed to create the backface render pipeline state with error:\n\(error)")
         }
         
+        // In the front face, we compute both attenuation and refraction...
         let frontfacePipelineDescriptor = MTLRenderPipelineDescriptor()
-        frontfacePipelineDescriptor.vertexFunction = transparentVertexFunction
+        frontfacePipelineDescriptor.vertexFunction = vertexFunction
         frontfacePipelineDescriptor.fragmentFunction = frontfaceFragmentFunction
-        frontfacePipelineDescriptor.colorAttachments[0].pixelFormat = colourResolvedTarget.pixelFormat
-        frontfacePipelineDescriptor.colorAttachments[0].isBlendingEnabled = true
-        frontfacePipelineDescriptor.colorAttachments[0].rgbBlendOperation = .add
-        frontfacePipelineDescriptor.colorAttachments[0].sourceRGBBlendFactor = .one
-        frontfacePipelineDescriptor.colorAttachments[0].destinationRGBBlendFactor = .source1Color
+        frontfacePipelineDescriptor.colorAttachments[0].pixelFormat = colourTarget.pixelFormat
+//        frontfacePipelineDescriptor.colorAttachments[0].isBlendingEnabled = true
+//        frontfacePipelineDescriptor.colorAttachments[0].rgbBlendOperation = .add
+//        frontfacePipelineDescriptor.colorAttachments[0].sourceRGBBlendFactor = .one
+//        frontfacePipelineDescriptor.colorAttachments[0].destinationRGBBlendFactor = .source1Color
         frontfacePipelineDescriptor.depthAttachmentPixelFormat = .depth32Float
-        frontfacePipelineDescriptor.sampleCount = sampleCount
         frontfacePipelineDescriptor.vertexDescriptor = gameObjects[0].mesh.vertexDescriptor
         frontfacePipelineDescriptor.label = "Frontface Pipeline State"
         
@@ -396,14 +427,12 @@ class Renderer: NSObject, MTKViewDelegate, SceneResponderDelegate {
             // Configure the render pass descriptor to use our colour and depth textures
             // We need to be explicit because we don't have an MTKView that provides our descriptor
             let firstPassDescriptor = MTLRenderPassDescriptor()
-            firstPassDescriptor.colorAttachments[0].texture = colourMultisampleTarget
-            firstPassDescriptor.colorAttachments[0].resolveTexture = colourResolvedTarget
+            firstPassDescriptor.colorAttachments[0].texture = colourTarget
             firstPassDescriptor.colorAttachments[0].loadAction = .dontCare
-            firstPassDescriptor.colorAttachments[0].storeAction = .storeAndMultisampleResolve
-            firstPassDescriptor.depthAttachment.texture = depthMultisampleTarget
-            firstPassDescriptor.depthAttachment.resolveTexture = depthResolvedTarget
+            firstPassDescriptor.colorAttachments[0].storeAction = .store
+            firstPassDescriptor.depthAttachment.texture = depthTarget
             firstPassDescriptor.depthAttachment.loadAction  = .clear
-            firstPassDescriptor.depthAttachment.storeAction = .storeAndMultisampleResolve
+            firstPassDescriptor.depthAttachment.storeAction = .store
             firstPassDescriptor.depthAttachment.clearDepth = 1.0
             
             // Then we encode commands like we did before
@@ -472,29 +501,54 @@ class Renderer: NSObject, MTKViewDelegate, SceneResponderDelegate {
             }
             firstPassRenderEncoder.popDebugGroup()
             
-            offset = opaqueOffset
-            
-            // Finally, draw the front of the transparent objects...
-            firstPassRenderEncoder.pushDebugGroup("Drawing the front of the transparent objects")
-            firstPassRenderEncoder.setRenderPipelineState(frontfacePipelineState)
-            firstPassRenderEncoder.setCullMode(.back) // Cull out the back
-            firstPassRenderEncoder.setDepthStencilState(frontfaceDepthState)
-            firstPassRenderEncoder.setFragmentTexture(depthResolvedTarget, index: 1)
-            for object in gameObjects {
-                firstPassRenderEncoder.pushDebugGroup("Working on front of \(object.mesh.mtkMesh.name)")
-
-                object.drawTransparentSubmeshes(usingEncoder: firstPassRenderEncoder, constantBufferOffset: offset)
-
-                offset += stride
-                firstPassRenderEncoder.popDebugGroup()
-            }
-            firstPassRenderEncoder.popDebugGroup()
-
-            
-            
             firstPassRenderEncoder.endEncoding()
             
-            // Now for the second pass, after rendering
+            // Because we're redrawing the same transparent submeshes (albeit with different states and stuff),
+            // we reset the offset back to the one after drawing opaque objects...
+            offset = opaqueOffset
+            
+            // Here we copy the colour and depth attachments into new textures which will be used to calculate
+            // attenuation and refraction
+            let refractorCopyEncoder = commandBuffer.makeBlitCommandEncoder()!
+            refractorCopyEncoder.label = "Refractor Copy Encoder"
+            refractorCopyEncoder.pushDebugGroup("Copying the colour rand depth targets into the refractor input")
+            refractorCopyEncoder.copy(from: colourTarget, to: refractorInputTexture)
+            refractorCopyEncoder.copy(from: depthTarget, to: refractorDepthTexture)
+            refractorCopyEncoder.popDebugGroup()
+            refractorCopyEncoder.endEncoding()
+            
+            firstPassDescriptor.colorAttachments[0].loadAction = .load
+            firstPassDescriptor.depthAttachment.storeAction = .dontCare
+
+            // Finally, draw the front of the transparent objects...
+            let frontfaceEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: firstPassDescriptor)!
+            frontfaceEncoder.label = "Frontface Render Command Encoder"
+            frontfaceEncoder.pushDebugGroup("Drawing the front of the transparent objects")
+            frontfaceEncoder.pushDebugGroup("Encoding the needed stuff")
+            frontfaceEncoder.setFrontFacing(.counterClockwise)
+            frontfaceEncoder.setCullMode(.back) // Cull out the back
+            frontfaceEncoder.setRenderPipelineState(frontfacePipelineState)
+            frontfaceEncoder.setDepthStencilState(frontfaceDepthState)
+            frontfaceEncoder.setVertexBuffer(constantBuffer, offset: 0, index: BufferIndex.localUniforms.rawValue)
+            frontfaceEncoder.setVertexBuffer(constantBuffer, offset: 0, index: BufferIndex.perFrameConstants.rawValue)
+            frontfaceEncoder.setFragmentBuffer(constantBuffer, offset: 0, index: BufferIndex.perFrameConstants.rawValue)
+            frontfaceEncoder.setFragmentTexture(refractorDepthTexture, index: TextureIndex.depth.rawValue)
+            frontfaceEncoder.setFragmentTexture(refractorInputTexture, index: TextureIndex.colour.rawValue)
+            frontfaceEncoder.popDebugGroup()
+            for object in gameObjects {
+                frontfaceEncoder.pushDebugGroup("Working on front of \(object.mesh.mtkMesh.name)")
+
+                object.drawTransparentSubmeshes(usingEncoder: frontfaceEncoder, constantBufferOffset: offset)
+
+                offset += stride
+                frontfaceEncoder.popDebugGroup()
+            }
+            frontfaceEncoder.popDebugGroup()
+
+            frontfaceEncoder.endEncoding()
+            
+            
+            // Now for the final pass, which is post-processing...
             let postRenderPassDescriptor = view.currentRenderPassDescriptor!
             postRenderPassDescriptor.colorAttachments[0].loadAction = .dontCare
             let finalRenderEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: postRenderPassDescriptor)!
@@ -504,7 +558,7 @@ class Renderer: NSObject, MTKViewDelegate, SceneResponderDelegate {
             finalRenderEncoder.setVertexBytes(MeshGeometry.screenQuadArray,
                                               length: MeshGeometry.screenQuadArray.count * MemoryLayout<Float32>.size,
                                               index: 0)
-            finalRenderEncoder.setFragmentTexture(colourResolvedTarget, index: 0)
+            finalRenderEncoder.setFragmentTexture(colourTarget, index: 0)
             finalRenderEncoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 6)
             finalRenderEncoder.endEncoding()
             finalRenderEncoder.popDebugGroup()
@@ -550,16 +604,6 @@ class Renderer: NSObject, MTKViewDelegate, SceneResponderDelegate {
         let width = Int(view.drawableSize.width)
         let height = Int(Int(view.drawableSize.height))
         
-        let multiSampleTextureDescriptor = MTLTextureDescriptor()
-        multiSampleTextureDescriptor.width = width
-        multiSampleTextureDescriptor.height = height
-        multiSampleTextureDescriptor.pixelFormat = .rgba16Float
-        multiSampleTextureDescriptor.textureType = .type2DMultisample
-        multiSampleTextureDescriptor.usage = MTLTextureUsage(rawValue: MTLTextureUsage.renderTarget.rawValue | MTLTextureUsage.shaderRead.rawValue)
-        multiSampleTextureDescriptor.resourceOptions = .storageModePrivate
-        multiSampleTextureDescriptor.sampleCount = sampleCount
-        
-        colourMultisampleTarget = device.makeTexture(descriptor: multiSampleTextureDescriptor)
         
         // Then create the resolved colour render target first
         let colourTextureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .rgba16Float,
@@ -569,19 +613,17 @@ class Renderer: NSObject, MTKViewDelegate, SceneResponderDelegate {
         colourTextureDescriptor.usage = MTLTextureUsage(rawValue: MTLTextureUsage.renderTarget.rawValue | MTLTextureUsage.shaderRead.rawValue)
         colourTextureDescriptor.resourceOptions = .storageModePrivate
         
-        colourResolvedTarget = device.makeTexture(descriptor: colourTextureDescriptor)
+        colourTarget = device.makeTexture(descriptor: colourTextureDescriptor)
+        colourTarget.label = "Colour Resolved Render Target"
         
-        // Then the depth multisample target for its pass
-        let depthMultisampleDescriptor = MTLTextureDescriptor()
-        depthMultisampleDescriptor.width = width
-        depthMultisampleDescriptor.height = height
-        depthMultisampleDescriptor.pixelFormat = .depth32Float
-        depthMultisampleDescriptor.textureType = .type2DMultisample
-        depthMultisampleDescriptor.usage = MTLTextureUsage(rawValue: MTLTextureUsage.renderTarget.rawValue | MTLTextureUsage.shaderRead.rawValue)
-        depthMultisampleDescriptor.resourceOptions = .storageModePrivate
-        depthMultisampleDescriptor.sampleCount = sampleCount
-        
-        depthMultisampleTarget = device.makeTexture(descriptor: depthMultisampleDescriptor)
+        let refractorInputDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .rgba16Float,
+                                                                                width: width,
+                                                                                height: height,
+                                                                                mipmapped: false)
+        refractorInputDescriptor.usage = .shaderRead
+        refractorInputDescriptor.resourceOptions = .storageModePrivate
+        refractorInputTexture = device.makeTexture(descriptor: refractorInputDescriptor)
+        refractorInputTexture.label = "Refractor Input Texture"
         
         // Finally, the resolved depth texture
         let depthTextureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .depth32Float,
@@ -590,8 +632,16 @@ class Renderer: NSObject, MTKViewDelegate, SceneResponderDelegate {
                                                                               mipmapped: false)
         depthTextureDescriptor.usage = MTLTextureUsage(rawValue: MTLTextureUsage.renderTarget.rawValue | MTLTextureUsage.shaderRead.rawValue)
         depthTextureDescriptor.resourceOptions = .storageModePrivate
-        depthResolvedTarget = device.makeTexture(descriptor: depthTextureDescriptor)
+        depthTarget = device.makeTexture(descriptor: depthTextureDescriptor)
         
+        let refractorDepthDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .depth32Float,
+                                                                                width: width,
+                                                                                height: height,
+                                                                                mipmapped: false)
+        refractorDepthDescriptor.usage = .shaderRead
+        refractorDepthDescriptor.resourceOptions = .storageModePrivate
+        refractorDepthTexture = device.makeTexture(descriptor: refractorDepthDescriptor)
+        refractorDepthTexture.label = "Refrector Input Depth Texture"
         
     }
     

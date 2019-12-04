@@ -58,6 +58,13 @@ typedef NS_ENUM(NSInteger, TextureIndex) {
     TextureIndexNormal     = 4,
     TextureIndexRoughness  = 5,
     TextureIndexIrradiance = 6,
+    TextureIndexDepth      = 7,
+    TextureIndexColour     = 8,
+};
+
+typedef NS_ENUM(NSInteger, FunctionConstant) {
+    FunctionConstantBackface  = 0,
+    FunctionConstantFrontface = 1,
 };
 
 typedef struct {
