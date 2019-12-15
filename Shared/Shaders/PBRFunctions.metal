@@ -157,7 +157,7 @@ fragment half4 helloFragmentShader(VertexOut in                         [[stage_
     half3 colour = diffuseTerm(parameters) + specularTerm(parameters) + emissivecolour;
     half alpha = basecolour.a;
     
-    // If it's the frontface, we need to compute the refraction
+    // If it's the frontface, we need to compute the refraction and attenuation
     if (is_frontface) {
         
         float4 position = in.position;
