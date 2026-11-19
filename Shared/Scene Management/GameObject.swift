@@ -34,7 +34,7 @@ struct GameObject {
         mesh.bindToVertexShader(encoder: encoder)
         encoder.setVertexBufferOffset(offset, index: BufferIndex.localUniforms.rawValue)
         
-        for (i, _) in materials.enumerated() {
+        for i in materials.indices {
             materials[i].bindTexturesToShader(encoder: encoder)
             mesh.drawSubmesh(atIndex: i, encoder: encoder)
         }
@@ -70,11 +70,8 @@ struct GameObject {
         mesh.bindToVertexShader(encoder: encoder)
         encoder.setVertexBufferOffset(offset, index: BufferIndex.localUniforms.rawValue)
         
-        
-        
         materials[submeshIndex].bindTexturesToShader(encoder: encoder)
         mesh.drawSubmesh(atIndex: submeshIndex, encoder: encoder)
-        
         
     }
     

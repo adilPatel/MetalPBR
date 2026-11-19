@@ -6,32 +6,34 @@
 //  Copyright © 2018 Adil Patel. All rights reserved.
 //
 
-import Cocoa
+import AppKit
 import MetalKit
+import OSLog
 
 // Our macOS specific view controller
-class GameViewController: NSViewController {
+final class GameViewController: NSViewController {
     
-    var renderer: Renderer!
-    var mtkView: MTKView!
-    var userInt: MacInputDelegate!
+    var renderer: Renderer?
+    var userInt: MacInputDelegate?
     
     var mouseIsInView = false
     
     var mosquitoScene = MosquitoScene()
     
+    /// The tokens returned when installing our local event monitors, so we can remove them later
+    private var eventMonitors = [Any]()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        
-        guard let mtkView = self.view as? MTKView else {
-            print("View attached to GameViewController is not an MTKView")
+        guard let mtkView = view as? MTKView else {
+            Logger.renderer.error("The view attached to GameViewController is not an MTKView")
             return
         }
         
         // Select the device to render with.  We choose the default device
         guard let defaultDevice = MTLCreateSystemDefaultDevice() else {
-            print("Metal is not supported on this device")
+            Logger.renderer.error("Metal is not supported on this device")
             return
         }
         
@@ -39,69 +41,81 @@ class GameViewController: NSViewController {
         
         mtkView.device = defaultDevice
         
-        guard let newRenderer = Renderer(metalKitView: mtkView, scene: mosquitoScene) else {
-            print("Renderer cannot be initialized")
+        guard let renderer = Renderer(metalKitView: mtkView, scene: mosquitoScene) else {
+            Logger.renderer.error("Renderer cannot be initialised")
             return
         }
         
-        renderer = newRenderer
+        self.renderer = renderer
         renderer.initialiseScene()
         
         renderer.mtkView(mtkView, drawableSizeWillChange: mtkView.drawableSize)
         
         mtkView.delegate = renderer
         
-        let area = NSTrackingArea(rect: mtkView.bounds,
-                                  options: NSTrackingArea.Options([.mouseEnteredAndExited,
-                                                                   .activeInActiveApp]),
+        // `.inVisibleRect` keeps the tracking area in sync with the view's bounds as the window resizes
+        let area = NSTrackingArea(rect: .zero,
+                                  options: [.mouseEnteredAndExited, .activeInActiveApp, .inVisibleRect],
                                   owner: self,
                                   userInfo: nil)
         mtkView.addTrackingArea(area)
         
-        self.userInt = (renderer.cameraController as! MacInputDelegate)
+        userInt = renderer.cameraController as? MacInputDelegate
+        
+    }
+    
+    override func viewDidAppear() {
+        super.viewDidAppear()
+        installEventMonitors()
+    }
+    
+    override func viewDidDisappear() {
+        super.viewDidDisappear()
+        removeEventMonitors()
+    }
+    
+    private func installEventMonitors() {
+        
+        guard eventMonitors.isEmpty else { return }
         
         // Set a block that fires when a key is pressed
-        NSEvent.addLocalMonitorForEvents(matching: .keyDown) {
-            (keyEvent) -> NSEvent? in
-            if self.keyDown(with: keyEvent) {
-                return nil
-            } else {
-                return keyEvent
-            }
+        if let monitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown, handler: { [weak self] keyEvent in
+            (self?.keyDown(with: keyEvent) ?? false) ? nil : keyEvent
+        }) {
+            eventMonitors.append(monitor)
         }
         
         // Set a block that fires when a key is released
-        NSEvent.addLocalMonitorForEvents(matching: .keyUp) {
-            (keyEvent) -> NSEvent? in
-            if self.keyUp(with: keyEvent) {
-                return nil
-            } else {
-                return keyEvent
-            }
+        if let monitor = NSEvent.addLocalMonitorForEvents(matching: .keyUp, handler: { [weak self] keyEvent in
+            (self?.keyUp(with: keyEvent) ?? false) ? nil : keyEvent
+        }) {
+            eventMonitors.append(monitor)
         }
         
         // Set a block that fires when the mouse is moved
-        NSEvent.addLocalMonitorForEvents(matching: .mouseMoved) {
-            (mouseEvent) -> NSEvent? in
-            if self.mouseMoved(with: mouseEvent) {
-                return nil
-            } else {
-                return mouseEvent
-            }
+        if let monitor = NSEvent.addLocalMonitorForEvents(matching: .mouseMoved, handler: { [weak self] mouseEvent in
+            (self?.mouseMoved(with: mouseEvent) ?? false) ? nil : mouseEvent
+        }) {
+            eventMonitors.append(monitor)
         }
         
     }
     
+    private func removeEventMonitors() {
+        eventMonitors.forEach(NSEvent.removeMonitor)
+        eventMonitors.removeAll()
+    }
+    
     func keyDown(with event: NSEvent) -> Bool {
         
-        userInt.keyDown(key: event.keyCode)
+        userInt?.keyDown(key: event.keyCode)
         
         return true
     }
     
     func keyUp(with event: NSEvent) -> Bool {
         
-        userInt.keyUp(key: event.keyCode)
+        userInt?.keyUp(key: event.keyCode)
         
         return true
     }
@@ -109,7 +123,7 @@ class GameViewController: NSViewController {
     func mouseMoved(with event: NSEvent) -> Bool {
         
         if mouseIsInView {
-            userInt.mouseMoved(position: event.locationInWindow)
+            userInt?.mouseMoved(position: event.locationInWindow)
         }
         
         return true
@@ -125,31 +139,31 @@ class GameViewController: NSViewController {
     
     override func mouseDown(with event: NSEvent) {
         if mouseIsInView {
-            userInt.mouseClicked(position: event.locationInWindow)
+            userInt?.mouseClicked(position: event.locationInWindow)
         }
     }
     
     override func mouseDragged(with event: NSEvent) {
         if mouseIsInView {
-            userInt.mouseDragged(position: event.locationInWindow)
+            userInt?.mouseDragged(position: event.locationInWindow)
         }
     }
     
     override func mouseUp(with event: NSEvent) {
         if mouseIsInView {
-            userInt.mouseReleased(position: event.locationInWindow)
+            userInt?.mouseReleased(position: event.locationInWindow)
         }
     }
     
     override var acceptsFirstResponder: Bool {
-        return true
+        true
     }
     
     override func becomeFirstResponder() -> Bool {
-        return true
+        true
     }
     
     override func resignFirstResponder() -> Bool {
-        return true
+        true
     }
 }

@@ -6,10 +6,10 @@
 //  Copyright © 2018 Adil Patel. All rights reserved.
 //
 
-import Cocoa
+import AppKit
 import simd
 
-class OrbitCameraController: NSObject, MacInputDelegate, CameraController {
+final class OrbitCameraController: NSObject, MacInputDelegate, CameraController {
     
     var camera: Camera
     

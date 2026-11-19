@@ -8,9 +8,9 @@
 
 import Foundation
 
-struct RobotScene: Scene {    
+struct RobotScene: Scene {
     
-    var sceneResponder: SceneResponderDelegate!
+    weak var sceneResponder: SceneResponderDelegate?
     
     
     func sceneInit() {

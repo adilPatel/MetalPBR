@@ -8,13 +8,13 @@
 
 import UIKit
 import MetalKit
+import OSLog
 
 // Our iOS specific view controller
-class GameViewController: UIViewController {
+final class GameViewController: UIViewController {
     
-    var renderer: Renderer!
-    var mtkView: MTKView!
-    var userInt: TouchInputDelegate!
+    var renderer: Renderer?
+    var userInt: TouchInputDelegate?
     
     var mosquitoScene = MosquitoScene()
 
@@ -23,35 +23,35 @@ class GameViewController: UIViewController {
         super.viewDidLoad()
         
         guard let mtkView = view as? MTKView else {
-            print("View of Gameview controller is not an MTKView")
+            Logger.renderer.error("The view of GameViewController is not an MTKView")
             return
         }
         
         // Select the device to render with.  We choose the default device
         guard let defaultDevice = MTLCreateSystemDefaultDevice() else {
-            print("Metal is not supported")
+            Logger.renderer.error("Metal is not supported on this device")
             return
         }
         
         ResourceManager.device = defaultDevice
         
         mtkView.device = defaultDevice
-        mtkView.backgroundColor = UIColor.black
+        mtkView.backgroundColor = .black
         mtkView.isMultipleTouchEnabled = true
         
-        guard let newRenderer = Renderer(metalKitView: mtkView, scene: mosquitoScene) else {
-            print("Renderer cannot be initialized")
+        guard let renderer = Renderer(metalKitView: mtkView, scene: mosquitoScene) else {
+            Logger.renderer.error("Renderer cannot be initialised")
             return
         }
         
-        renderer = newRenderer
+        self.renderer = renderer
         renderer.initialiseScene()
         
         renderer.mtkView(mtkView, drawableSizeWillChange: mtkView.drawableSize)
         
         mtkView.delegate = renderer
         
-        self.userInt = (renderer.cameraController as! TouchInputDelegate)
+        userInt = renderer.cameraController as? TouchInputDelegate
         
         let panGestureRecogniser = UIPanGestureRecognizer(target: self, action: #selector(panned))
         view.addGestureRecognizer(panGestureRecogniser)
@@ -59,7 +59,7 @@ class GameViewController: UIViewController {
     }
     
     @objc func panned(recogniser: UIPanGestureRecognizer) {
-        userInt.panned(gestureRecogniser: recogniser, in: view)
+        userInt?.panned(gestureRecogniser: recogniser, in: view)
     }
     
     //    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -79,9 +79,14 @@ class GameViewController: UIViewController {
     //    }
     
     
-    // If you're using an iPhone X, this hides the home indicator (that line at the bottom)
+    // On devices without a Home button, this hides the home indicator (that line at the bottom)
     override var prefersHomeIndicatorAutoHidden: Bool {
-        return true
+        true
+    }
+    
+    // Replaces the legacy UIStatusBarHidden Info.plist key
+    override var prefersStatusBarHidden: Bool {
+        true
     }
     
 }

@@ -10,7 +10,7 @@ import Foundation
 
 struct MosquitoScene: Scene {
     
-    var sceneResponder: SceneResponderDelegate!
+    weak var sceneResponder: SceneResponderDelegate?
 
     func sceneInit() {
         

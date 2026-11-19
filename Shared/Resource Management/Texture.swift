@@ -9,6 +9,7 @@
 import Foundation
 import Metal
 import MetalKit
+import OSLog
 
 enum TextureErrors: Error {
     case badPath
@@ -42,51 +43,32 @@ struct Texture {
          device: MTLDevice) {
         
         // Take care of all the texture creation options here...
-        let mipMapCreation = NSNumber(value: createMipMaps)
-        let storageMode  = NSNumber(value: textureStorage.rawValue)
-        let textureUsage = NSNumber(value: usage.rawValue)
-        let textureCPUCacheMode = NSNumber(value: cpuCacheMode.rawValue)
-        let allocateMipMaps = NSNumber(value: createMipMaps)
+        let options: [MTKTextureLoader.Option: Any] = [
+            .generateMipmaps: createMipMaps,
+            .allocateMipmaps: createMipMaps,
+            .textureStorageMode: textureStorage.rawValue,
+            .textureUsage: usage.rawValue,
+            .textureCPUCacheMode: cpuCacheMode.rawValue
+        ]
         
-        let options = [MTKTextureLoader.Option.generateMipmaps     : mipMapCreation,
-                       MTKTextureLoader.Option.textureStorageMode  : storageMode,
-                       MTKTextureLoader.Option.textureUsage        : textureUsage,
-                       MTKTextureLoader.Option.textureCPUCacheMode : textureCPUCacheMode,
-                       MTKTextureLoader.Option.allocateMipmaps     : allocateMipMaps]
-        
-        // Now we create the actual texture
-        let textureLoader = Texture.createTextureLoader(device: device)
-        
-        // Start by loading the file
-        let separated = file.components(separatedBy: ".")
-        guard let url = Bundle.main.url(forResource: separated[0], withExtension: separated[1]) else {
-            print("ERROR: Failed to load \(file)!")
-            return
-        }
-        do {
-            try texture = textureLoader.newTexture(URL: url, options: options)
-            texture?.label = name
-        } catch {
-            print("ERROR: Failed to create \(name) texture with error: \(error)")
-        }
+        self.init(name: name, file: file, options: options, device: device)
         
     }
     
-    init(name: String, file: String, options: [MTKTextureLoader.Option : NSNumber], device: MTLDevice) {
+    init(name: String, file: String, options: [MTKTextureLoader.Option: Any], device: MTLDevice) {
         
         let textureLoader = Texture.createTextureLoader(device: device)
         
         // Load the file
-        let separated = file.components(separatedBy: ".")
-        guard let url = Bundle.main.url(forResource: separated[0], withExtension: separated[1]) else {
-            print("ERROR: Failed to load \(file)!")
+        guard let url = Bundle.main.url(forResource: file, withExtension: nil) else {
+            Logger.resources.error("Failed to find \(file) in the bundle")
             return
         }
         do {
-            try texture = textureLoader.newTexture(URL: url, options: options)
+            texture = try textureLoader.newTexture(URL: url, options: options)
             texture?.label = name
         } catch {
-            print("ERROR: Failed to create \(name) texture with error: \(error)")
+            Logger.resources.error("Failed to create \(name) texture with error: \(error)")
         }
         
     }
@@ -94,39 +76,28 @@ struct Texture {
     init(fromAssetCatalogueNamed name: String, usage: MTLTextureUsage, storageMode: MTLStorageMode, device: MTLDevice) {
         
         // These are simpler because mip-mapping is handled in the asset catalogue
-        let storageMode = NSNumber(value: storageMode.rawValue)
-        let textureUsage = NSNumber(value: usage.rawValue)
+        let options: [MTKTextureLoader.Option: Any] = [
+            .textureStorageMode: storageMode.rawValue,
+            .textureUsage: usage.rawValue
+        ]
         
-        let options = [MTKTextureLoader.Option.textureStorageMode : storageMode,
-                       MTKTextureLoader.Option.textureUsage : textureUsage]
-        
-        let textureLoader = MTKTextureLoader(device: device)
-        
-        
-        do {
-            try texture = textureLoader.newTexture(name: name,
-                                                   scaleFactor: 1.0,
-                                                   bundle: nil,
-                                                   options: options)
-        } catch {
-            print("ERROR: Failed to create skybox with error: \(error)")
-        }
+        self.init(fromAssetCatalogueNamed: name, options: options, device: device)
         
     }
     
-    init(fromAssetCatalogueNamed name: String, options: [MTKTextureLoader.Option : NSNumber], device: MTLDevice) {
+    init(fromAssetCatalogueNamed name: String, options: [MTKTextureLoader.Option: Any], device: MTLDevice) {
         
         // This is even simpler than the above
-        let textureLoader = MTKTextureLoader(device: device)
-        
+        let textureLoader = Texture.createTextureLoader(device: device)
         
         do {
-            try texture = textureLoader.newTexture(name: name,
+            texture = try textureLoader.newTexture(name: name,
                                                    scaleFactor: 1.0,
                                                    bundle: nil,
                                                    options: options)
+            texture?.label = name
         } catch {
-            print("ERROR: Failed to create skybox with error: \(error)")
+            Logger.resources.error("Failed to create \(name) texture from the asset catalogue with error: \(error)")
         }
         
     }
@@ -134,34 +105,32 @@ struct Texture {
     init(for semantic: MDLMaterialSemantic, in material: MDLMaterial?, textureLoader: MTKTextureLoader) {
         
         // It grabs a material property (like roughness) from the source texture
-        guard let materialProperty = material?.property(with: semantic) else { return }
-        guard let sourceTexture = materialProperty.textureSamplerValue?.texture else { return }
+        guard let materialProperty = material?.property(with: semantic),
+              let sourceTexture = materialProperty.textureSamplerValue?.texture else { return }
         
         // We aren't mip-mapping the tangent space normals
         let wantMips = materialProperty.semantic != .tangentSpaceNormal
-        let options: [MTKTextureLoader.Option : Any] = [ .generateMipmaps : wantMips ]
-        
+        let options: [MTKTextureLoader.Option: Any] = [
+            .generateMipmaps: wantMips,
+            .textureStorageMode: MTLStorageMode.private.rawValue,
+            .textureUsage: MTLTextureUsage.shaderRead.rawValue
+        ]
         
         texture = try? textureLoader.newTexture(texture: sourceTexture, options: options)
         
     }
     
     static func createBlankTexture(colour: [UInt8], device: MTLDevice) -> MTLTexture? {
-        
-        let bounds = MTLRegionMake2D(0, 0, 1, 1)
-        let descriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .rgba8Unorm,
-                                                                  width: bounds.size.width,
-                                                                  height: bounds.size.height,
-                                                                  mipmapped: false)
-        descriptor.usage = .shaderRead
-        let defaultTexture = device.makeTexture(descriptor: descriptor)!
-        defaultTexture.replace(region: bounds, mipmapLevel: 0, withBytes: colour, bytesPerRow: 4)
-        defaultTexture.label = "Blank Colour Texture"
-        return defaultTexture
-        
+        createSinglePixelTexture(bytes: colour, label: "Blank Colour Texture", device: device)
     }
     
     static func createBlankNormalMap(device: MTLDevice) -> MTLTexture? {
+        // Converts to (0, 0, 1) in the shader after mapping to a normal
+        createSinglePixelTexture(bytes: [127, 127, 255, 255], label: "Blank Normal Map", device: device)
+    }
+    
+    /// Creates a 1x1 RGBA8 texture filled with the supplied pixel
+    private static func createSinglePixelTexture(bytes: [UInt8], label: String, device: MTLDevice) -> MTLTexture? {
         
         let bounds = MTLRegionMake2D(0, 0, 1, 1)
         let descriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .rgba8Unorm,
@@ -169,12 +138,13 @@ struct Texture {
                                                                   height: bounds.size.height,
                                                                   mipmapped: false)
         descriptor.usage = .shaderRead
-        
-        let defaultNormalMap = device.makeTexture(descriptor: descriptor)!
-        let defaultNormal: [UInt8] = [127, 127, 255, 255] // Converts to (0, 0, 0, 1) in the shader after mapping to a normal
-        defaultNormalMap.replace(region: bounds, mipmapLevel: 0, withBytes: defaultNormal, bytesPerRow: 4)
-        defaultNormalMap.label = "Blank Normal Map"
-        return defaultNormalMap
+        guard let texture = device.makeTexture(descriptor: descriptor) else {
+            Logger.resources.error("Failed to allocate \(label)")
+            return nil
+        }
+        texture.replace(region: bounds, mipmapLevel: 0, withBytes: bytes, bytesPerRow: 4)
+        texture.label = label
+        return texture
         
     }
     
@@ -206,7 +176,7 @@ struct Texture {
     
     
     static func createTextureLoader(device: MTLDevice) -> MTKTextureLoader {
-        return MTKTextureLoader(device: device)
+        MTKTextureLoader(device: device)
     }
     
 }
@@ -226,7 +196,6 @@ struct Sampler {
     
     func bindToFragmentShader(encoder: MTLRenderCommandEncoder, index: Int) {
         encoder.setFragmentSamplerState(samplerState, index: index)
-        
     }
     
     func bindToComputeShader(encoder: MTLComputeCommandEncoder, index: Int) {
@@ -246,5 +215,3 @@ func createSamplerDescriptor() -> MTLSamplerDescriptor {
     samplerDescriptor.label = "Texture Sampler"
     return samplerDescriptor
 }
-
-

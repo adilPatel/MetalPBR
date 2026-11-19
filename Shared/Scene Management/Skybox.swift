@@ -10,6 +10,7 @@ import Foundation
 import Metal
 import MetalKit
 import ModelIO
+import OSLog
 import simd
 
 /// This structure handles the generation and drawing of the skybox.
@@ -46,9 +47,9 @@ struct Skybox {
         mdlMesh.vertexDescriptor = mdlVertexDescriptor
         
         do {
-            try mtkMesh = MTKMesh(mesh: mdlMesh, device: device)
+            mtkMesh = try MTKMesh(mesh: mdlMesh, device: device)
         } catch {
-            print("ERROR: Failed to create skybox with error:\n\(error)")
+            Logger.renderer.error("Failed to create skybox mesh with error: \(error)")
             return
         }
         
@@ -114,7 +115,7 @@ struct Skybox {
                                            fragmentFunction: MTLFunction?,
                                            vertexDescriptor: MTLVertexDescriptor,
                                            colourPixelFormat: MTLPixelFormat,
-                                           depthStencilPixelFormat: MTLPixelFormat) -> MTLRenderPipelineState {
+                                           depthStencilPixelFormat: MTLPixelFormat) -> MTLRenderPipelineState? {
         
         // The difference here is that we're using different shaders and a different vertex descriptor
         let pipelineDescriptor = MTLRenderPipelineDescriptor()
@@ -123,15 +124,14 @@ struct Skybox {
         pipelineDescriptor.colorAttachments[0].pixelFormat = colourPixelFormat
         pipelineDescriptor.depthAttachmentPixelFormat = depthStencilPixelFormat
         pipelineDescriptor.vertexDescriptor = vertexDescriptor
+        pipelineDescriptor.label = "Skybox Pipeline State"
         
-        var pipelineState: MTLRenderPipelineState!
         do {
-            try pipelineState = device.makeRenderPipelineState(descriptor: pipelineDescriptor)
+            return try device.makeRenderPipelineState(descriptor: pipelineDescriptor)
         } catch {
-            print("ERROR: Could not create skybox pipeline state with error:\n\(error)")
+            Logger.renderer.error("Could not create skybox pipeline state with error: \(error)")
+            return nil
         }
-        
-        return pipelineState
     }
     
     private func createVertexDescriptor() -> MTLVertexDescriptor {
@@ -172,27 +172,10 @@ struct Skybox {
     private func createTexture(device: MTLDevice) -> MTLTexture? {
         
         // There's a fixed set of options for this texture
-        let storageMode = NSNumber(value: MTLStorageMode.`private`.rawValue)
-        let textureUsage = NSNumber(value: MTLTextureUsage.shaderRead.rawValue)
-        
-        let options = [MTKTextureLoader.Option.textureStorageMode : storageMode,
-                       MTKTextureLoader.Option.textureUsage : textureUsage]
-        
-        let textureLoader = MTKTextureLoader(device: device)
-        
-        var texture: MTLTexture?
-        
-        do {
-            try texture = textureLoader.newTexture(name: "River Skybox",
-                                                   scaleFactor: 1.0,
-                                                   bundle: nil,
-                                                   options: options)
-        } catch {
-            print("ERROR: Failed to create skybox with error: \(error)")
-        }
-        
-        
-        return texture
+        Texture(fromAssetCatalogueNamed: "River Skybox",
+                usage: .shaderRead,
+                storageMode: .private,
+                device: device).texture
         
     }
     

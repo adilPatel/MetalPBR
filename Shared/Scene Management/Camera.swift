@@ -9,12 +9,6 @@
 import Foundation
 import simd
 
-#if os(OSX)
-import Cocoa
-#else
-import UIKit
-#endif
-
 enum CameraType {
     
 }
@@ -119,7 +113,7 @@ struct OrbitCamera: Camera {
         
         currentViewMatrix = Maths.createTranslationMatrix(vector: -origin)
         
-        position = origin + radius * SIMD3<Float>(sinf(azimuth) * cosf(elevation), sinf(azimuth) * sinf(elevation), sinf(elevation))
+        position = origin + radius * SIMD3<Float>(sin(azimuth) * cos(elevation), sin(azimuth) * sin(elevation), sin(elevation))
         
         translateCamera(byVector: position)
 
@@ -137,7 +131,7 @@ struct OrbitCamera: Camera {
         azimuth += azimuthOffset
         altitude += altitudeOffset
 
-        position = origin + radius * SIMD3<Float>(cosf(azimuth) * sinf(altitude), sinf(azimuth) * sinf(altitude), sinf(azimuth) * cosf(altitude))
+        position = origin + radius * SIMD3<Float>(cos(azimuth) * sin(altitude), sin(azimuth) * sin(altitude), sin(azimuth) * cos(altitude))
 
         azimuthOffset = 0.0
         altitudeOffset = 0.0

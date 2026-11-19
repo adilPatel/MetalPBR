@@ -9,7 +9,7 @@
 import UIKit
 import simd
 
-class OrbitCameraController: NSObject, TouchInputDelegate, CameraController {    
+final class OrbitCameraController: NSObject, TouchInputDelegate, CameraController {    
     
     var camera: Camera
     
@@ -25,7 +25,7 @@ class OrbitCameraController: NSObject, TouchInputDelegate, CameraController {
         camera.azimuthOffset = azimuthSensitivity * Float(delta.x)
         camera.altitudeOffset = elevationSensitivity * Float(delta.y)
         
-        gestureRecogniser.setTranslation(CGPoint(x: 0.0, y: 0.0), in: view)
+        gestureRecogniser.setTranslation(.zero, in: view)
         
     }
     

@@ -10,6 +10,7 @@ import Foundation
 import Metal
 import MetalKit
 import ModelIO
+import OSLog
 import simd
 
 enum MeshError: Error {
@@ -24,7 +25,7 @@ enum VertexLayout {
 }
 
 /// This structure loads all meshes and textures from a given 3D scene file.
-struct SceneAsset {
+enum SceneAsset {
     
     static func createObjectsFromScene(name: String, url: URL, device: MTLDevice) -> [GameObject] {
         
@@ -38,7 +39,7 @@ struct SceneAsset {
         let vertexDescriptor = VertexDescriptor.create(withLayout: .positionNormalTangentTexcoord)
         
         // Here we define the vertex layout and add the vertex descriptor
-        for sourceMesh in asset.childObjects(of: MDLMesh.self) as! [MDLMesh] {
+        for sourceMesh in asset.childObjects(of: MDLMesh.self).compactMap({ $0 as? MDLMesh }) {
             sourceMesh.addOrthTanBasis(forTextureCoordinateAttributeNamed: MDLVertexAttributeTextureCoordinate,
                                        normalAttributeNamed: MDLVertexAttributeNormal,
                                        tangentAttributeNamed: MDLVertexAttributeTangent)
@@ -46,20 +47,21 @@ struct SceneAsset {
         }
         
         // The tuple contains MDLMeshes and their corresponding MTKMeshes
-        guard let (sourceMeshes, meshes) = try? MTKMesh.newMeshes(asset: asset, device: device) else {
-            fatalError("Could not convert ModelIO meshes to MetalKit meshes")
+        let sourceMeshes: [MDLMesh]
+        let meshes: [MTKMesh]
+        do {
+            (sourceMeshes, meshes) = try MTKMesh.newMeshes(asset: asset, device: device)
+        } catch {
+            fatalError("Could not convert ModelIO meshes to MetalKit meshes: \(error)")
         }
         
-        var nodes = Array<GameObject>()
+        var nodes = [GameObject]()
         let textureLoader = Texture.createTextureLoader(device: device)
         
         // Get all materials from submeshes and create nodes from them
         for (sourceMesh, mtkMesh) in zip(sourceMeshes, meshes) {
-            var materials = [Material]()
-            for sourceSubmesh in sourceMesh.submeshes as! [MDLSubmesh] {
-                let material = Material(material: sourceSubmesh.material, textureLoader: textureLoader)
-                materials.append(material)
-            }
+            let submeshes = sourceMesh.submeshes?.compactMap { $0 as? MDLSubmesh } ?? []
+            let materials = submeshes.map { Material(material: $0.material, textureLoader: textureLoader) }
             let mesh = Mesh(name: name, mtkMesh: mtkMesh, vertexDescriptor: vertexDescriptor)
             let node = GameObject(mesh: mesh, materials: materials)
             nodes.append(node)
@@ -84,9 +86,8 @@ struct MeshGeometry {
         vertexDescriptor = VertexDescriptor.create(withLayout: layout)
         
         // Create the URL for the model file
-        let separated = modelFile.components(separatedBy: ".")
-        guard let url = Bundle.main.url(forResource: separated[0], withExtension: separated[1]) else {
-            print("ERROR: Failed to load \(modelFile)!")
+        guard let url = Bundle.main.url(forResource: modelFile, withExtension: nil) else {
+            Logger.resources.error("Failed to find \(modelFile) in the bundle")
             return
         }
         
@@ -96,8 +97,8 @@ struct MeshGeometry {
         // Model I/O fetches an asset, which is a superclass for meshes, lights, and other stuff
         let asset = MDLAsset(url: url, vertexDescriptor: nil, bufferAllocator: allocator)
         
-        guard let mdlMesh = asset[0] as? MDLMesh else {
-            print("ERROR: Failed to create mesh named \(separated[0])!")
+        guard let mdlMesh = asset.object(at: 0) as? MDLMesh else {
+            Logger.resources.error("Failed to create mesh from \(modelFile)")
             return
         }
         
@@ -111,9 +112,9 @@ struct MeshGeometry {
         mdlMesh.vertexDescriptor = vertexDescriptor
         // And we construct our MTKMesh
         do {
-            try mtkMesh = MTKMesh(mesh: mdlMesh, device: device)
+            mtkMesh = try MTKMesh(mesh: mdlMesh, device: device)
         } catch {
-            print("ERROR: Failed to allocate MetalKit mesh for \(separated[0])!")
+            Logger.resources.error("Failed to allocate MetalKit mesh for \(modelFile): \(error)")
         }
         
     }
@@ -139,15 +140,15 @@ struct MeshGeometry {
         mdlMesh.vertexDescriptor = vertexDescriptor
         
         do {
-            try mtkMesh = MTKMesh(mesh: mdlMesh, device: device)
+            mtkMesh = try MTKMesh(mesh: mdlMesh, device: device)
         } catch {
-            print("ERROR: Failed to create sphere!")
+            Logger.resources.error("Failed to create sphere: \(error)")
         }
         
     }
     
     init(boxWithExtent extent: SIMD3<Float>,
-         segments: vector_uint3,
+         segments: SIMD3<UInt32>,
          layout: VertexLayout,
          device: MTLDevice) {
         
@@ -167,9 +168,9 @@ struct MeshGeometry {
         
         
         do {
-            try mtkMesh = MTKMesh(mesh: mdlMesh, device: device)
+            mtkMesh = try MTKMesh(mesh: mdlMesh, device: device)
         } catch {
-            print("ERROR: Failed to create box!")
+            Logger.resources.error("Failed to create box: \(error)")
         }
         
     }
@@ -192,14 +193,14 @@ struct MeshGeometry {
         mdlMesh.vertexDescriptor = vertexDescriptor
         
         do {
-            try mtkMesh = MTKMesh(mesh: mdlMesh, device: device)
+            mtkMesh = try MTKMesh(mesh: mdlMesh, device: device)
         } catch {
-            print("ERROR: Failed to create plane!")
+            Logger.resources.error("Failed to create plane: \(error)")
         }
         
     }
     
-    static var screenQuadArray: [Float32] = [
+    static let screenQuadArray: [Float32] = [
         
         1.0,  1.0,      1.0, 0.0,
         -1.0,  1.0,      0.0, 0.0,
@@ -213,7 +214,7 @@ struct MeshGeometry {
     
 }
 
-struct VertexDescriptor {
+enum VertexDescriptor {
     
     static func create(withLayout layout: VertexLayout) -> MDLVertexDescriptor {
         switch layout {

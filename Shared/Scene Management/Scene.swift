@@ -11,8 +11,9 @@ import Foundation
 /// This protocol is conformed to by all scenes.
 protocol Scene {
     
-    /// An object which handles all scene events, like adding an object or setting the camera
-    var sceneResponder: SceneResponderDelegate! { get set }
+    /// An object which handles all scene events, like adding an object or setting the camera.
+    /// Conforming types should hold this weakly, as the responder usually owns the scene.
+    var sceneResponder: SceneResponderDelegate? { get set }
     
     func sceneInit()
     
@@ -35,17 +36,17 @@ protocol Scene {
 extension Scene {
     
     func addToScene(object: GameObject, position: SIMD3<Float>) {
-        sceneResponder.addedToScene(object: object, position: position)
+        sceneResponder?.addedToScene(object: object, position: position)
     }
     
     func setOrbitCamera(withRadius radius: Float, azimuth: Float, elevation: Float, origin: SIMD3<Float>) {
-        sceneResponder.orbitCameraWasSet(withRadius: radius, azimuth: azimuth, elevation: elevation, origin: origin)
+        sceneResponder?.orbitCameraWasSet(withRadius: radius, azimuth: azimuth, elevation: elevation, origin: origin)
     }
     
 }
 
 /// Every scene needs a scene responder to handle events like object creation. Scene responders conform to this protocol.
-protocol SceneResponderDelegate {
+protocol SceneResponderDelegate: AnyObject {
     
     func addedToScene(object: GameObject, position: SIMD3<Float>)
     

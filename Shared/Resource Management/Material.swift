@@ -41,36 +41,34 @@ struct Material {
          emissiveName: String?,
          device: MTLDevice) {
         
-        let storageMode = NSNumber(value: MTLStorageMode.`private`.rawValue)
-        let textureUsage = NSNumber(value: MTLTextureUsage.shaderRead.rawValue)
+        let options: [MTKTextureLoader.Option: Any] = [
+            .textureStorageMode: MTLStorageMode.private.rawValue,
+            .textureUsage: MTLTextureUsage.shaderRead.rawValue
+        ]
         
-        let options = [MTKTextureLoader.Option.textureStorageMode : storageMode,
-                       MTKTextureLoader.Option.textureUsage : textureUsage]
-        
-        if let baseColourName = baseColourName {
+        if let baseColourName {
             baseColour = Texture(fromAssetCatalogueNamed: baseColourName, options: options, device: device)
         }
         
-        if let ambientOcclusionName = ambientOcclusionName {
+        if let ambientOcclusionName {
             ambientOcclusion = Texture(fromAssetCatalogueNamed: ambientOcclusionName, options: options, device: device)
         }
         
-        if let metallicName = metallicName {
+        if let metallicName {
             metallic = Texture(fromAssetCatalogueNamed: metallicName, options: options, device: device)
         }
         
-        if let roughnessName = roughnessName {
+        if let roughnessName {
             roughness = Texture(fromAssetCatalogueNamed: roughnessName, options: options, device: device)
         }
         
-        if let normalName = normalName {
+        if let normalName {
             normal = Texture(fromAssetCatalogueNamed: normalName, options: options, device: device)
         }
         
-        if let emissiveName = emissiveName {
+        if let emissiveName {
             emissive = Texture(fromAssetCatalogueNamed: emissiveName, options: options, device: device)
         }
-        
         
     }
     
